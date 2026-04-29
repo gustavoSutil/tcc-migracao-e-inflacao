@@ -1,0 +1,1250 @@
+<html>
+<head>
+<title>migracao_regional_e_alugueis.ipynb</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #bcbec4;}
+.s1 { color: #cf8e6d;}
+.s2 { color: #bcbec4;}
+.s3 { color: #7a7e85;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+.ls0 { height: 1px; border-width: 0; color: #43454a; background-color:#43454a}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+migracao_regional_e_alugueis.ipynb</font>
+</center></td></tr></table>
+<pre><span class="s0">#%% md 
+# 🧭 Estrutura reestruturada do projeto 
+ 
+## 1️⃣ Problema de pesquisa 
+ 
+Pergunta central: 
+ 
+&gt; O crescimento populacional pressiona os preços de aluguel nas cidades brasileiras quando a oferta imobiliária não acompanha a demanda? 
+ 
+Subperguntas: 
+ 
+* qual o efeito **de curto prazo**? 
+* qual o efeito **de longo prazo**? 
+* fatores financeiros (juros) amplificam esse efeito? 
+ 
+Hipótese principal: 
+ 
+[ 
+\Delta População ↑ \Rightarrow Aluguel ↑ 
+] 
+ 
+quando a oferta imobiliária é rígida. 
+ 
+--- 
+ 
+# 2️⃣ Coleta de dados 
+ 
+Ideal incluir **três blocos de variáveis**. 
+ 
+### Demanda por moradia 
+ 
+* população 
+* crescimento populacional 
+* renda 
+* emprego 
+* atividade econômica 
+ 
+### Oferta imobiliária 
+ 
+* estoque de imóveis 
+* novos alvarás 
+* construção civil 
+* custo da construção 
+ 
+### Financeiro 
+ 
+* juros 
+* crédito imobiliário 
+ 
+Exemplos no Brasil: 
+ 
+* população → IBGE 
+* aluguel → FipeZap 
+* atividade → IBC-Br 
+* construção → CUB ou INCC 
+ 
+--- 
+ 
+# 3️⃣ Construção do dataset 
+ 
+Painel: 
+ 
+[ 
+cidade_i , tempo_t 
+] 
+ 
+Estrutura: 
+ 
+| cidade | ano | aluguel | população | renda | construção | juros | 
+| ------ | --- | ------- | --------- | ----- | ---------- | ----- | 
+ 
+Painel balanceado se possível. 
+ 
+--- 
+ 
+# 4️⃣ Transformações 
+ 
+Separar **curto prazo e longo prazo**. 
+ 
+### longo prazo 
+ 
+variáveis em **log nível** 
+ 
+[ 
+log(aluguel) 
+] 
+ 
+[ 
+log(população) 
+] 
+ 
+Isso captura **elasticidade estrutural**. 
+ 
+--- 
+ 
+### curto prazo 
+ 
+diferenças: 
+ 
+[ 
+\Delta log(aluguel) 
+] 
+ 
+[ 
+\Delta log(população) 
+] 
+ 
+Isso captura **choques temporários**. 
+ 
+--- 
+ 
+# 5️⃣ Análise exploratória 
+ 
+Aqui você pode mostrar: 
+ 
+* crescimento populacional 
+* evolução dos aluguéis 
+* dispersão entre cidades 
+ 
+Gráficos úteis: 
+ 
+* aluguel vs população 
+* crescimento populacional vs inflação de aluguel 
+ 
+Isso ajuda a **visualizar a teoria antes da econometria**. 
+ 
+--- 
+ 
+# 6️⃣ VIF 
+ 
+Testar multicolinearidade. 
+ 
+Principalmente entre: 
+ 
+* renda 
+* atividade econômica 
+* emprego 
+ 
+--- 
+ 
+# 7️⃣ Stepwise / AIC 
+ 
+Selecionar variáveis mais relevantes para: 
+ 
+* demanda 
+* oferta 
+* financeiro 
+ 
+Mas sempre respeitando **teoria econômica**. 
+ 
+Não deixar algoritmo remover variável essencial. 
+ 
+--- 
+ 
+# 8️⃣ Modelos econométricos de painel 
+ 
+Aqui você separa **três modelos**. 
+ 
+--- 
+ 
+## Modelo 1 — longo prazo 
+ 
+$$ 
+log(aluguel_{it}) = 
+\alpha_i + 
+\beta_1 log(pop_{it}) + 
+\beta_2 renda_{it} + 
+\beta_3 oferta_{it} 
+$$ 
+ 
+Aqui você quer provar: 
+ 
+$$ 
+\beta_1 &gt; 0 
+$$ 
+ 
+--- 
+ 
+## Modelo 2 — curto prazo 
+ 
+$$ 
+\Delta log(aluguel_{it}) = 
+\beta_1 \Delta log(pop_{it}) + 
+\beta_2 juros_t + 
+\beta_3 atividade_t 
+$$ 
+ 
+Aqui juros provavelmente aparecem mais. 
+ 
+--- 
+ 
+## Modelo 3 — interação demanda/oferta 
+ 
+$$ 
+log(aluguel) = 
+\beta_1 pop + 
+\beta_2 construção + 
+\beta_3 pop \times construção 
+$$ 
+ 
+Isso mostra: 
+ 
+**oferta imobiliária reduz pressão populacional.** 
+ 
+--- 
+ 
+# 9️⃣ XGBoost 
+ 
+Treinar modelo para prever: 
+ 
+$$ 
+\Delta aluguel 
+$$ 
+ 
+Variáveis: 
+ 
+* população 
+* renda 
+* atividade 
+* juros 
+* construção 
+ 
+Objetivo: 
+ 
+avaliar **importância relativa das variáveis**. 
+ 
+--- 
+ 
+# 🔟 Machine learning com painel 
+ 
+Possibilidades: 
+ 
+* panel random forest 
+* gradient boosting com efeitos fixos 
+ 
+Ou incluir: 
+ 
+``` 
+cidade como variável categórica 
+``` 
+ 
+--- 
+ 
+# 1️⃣1️⃣ SHAP 
+ 
+Interpretar ML. 
+ 
+Você pode mostrar: 
+ 
+* impacto da população 
+* impacto da atividade econômica 
+* impacto de juros 
+ 
+Gráfico típico: 
+ 
+``` 
+SHAP importance 
+``` 
+ 
+Isso ajuda a validar os resultados econométricos. 
+ 
+--- 
+ 
+# 1️⃣2️⃣ Interpretação econômica 
+ 
+Aqui você junta tudo: 
+ 
+Resultados possíveis: 
+ 
+* população afeta aluguel **no longo prazo** 
+* juros afetam aluguel **no curto prazo** 
+* oferta imobiliária modera esse efeito 
+ 
+Isso gera um argumento muito sólido. 
+ 
+--- 
+ 
+# 1️⃣3️⃣ Conclusão e implicações de política 
+ 
+Aqui entram suas ideias. 
+ 
+### Política 1 — incentivo à construção 
+ 
+Se população cresce mais que oferta: 
+ 
+``` 
+escassez de moradia 
+↓ 
+aluguel sobe 
+``` 
+ 
+Políticas possíveis: 
+ 
+* incentivos fiscais 
+* simplificação regulatória 
+* expansão urbana 
+ 
+--- 
+ 
+### Política 2 — crédito imobiliário 
+ 
+Se juros altos pressionam aluguel: 
+ 
+políticas possíveis: 
+ 
+* subsídio habitacional 
+* crédito imobiliário regional 
+ 
+Você pode discutir algo como: 
+ 
+**“Selic regional” ou políticas de crédito local.** 
+ 
+--- 
+ 
+# 🧠 Narrativa final do TCC 
+ 
+Ficaria assim: 
+ 
+1️⃣ população aumenta demanda por moradia 
+2️⃣ oferta reage lentamente 
+3️⃣ preços de aluguel sobem 
+4️⃣ juros amplificam esse efeito 
+5️⃣ políticas públicas devem expandir oferta imobiliária 
+ 
+--- 
+ 
+# ⭐ Resultado ideal do estudo 
+ 
+Se tudo funcionar bem, você mostrará: 
+ 
+* **população → aluguel (longo prazo)** 
+* **juros → aluguel (curto prazo)** 
+* **oferta imobiliária reduz pressão** 
+ 
+Isso vira um **argumento econômico completo**. <hr class="ls0">#%% 
+</span><span class="s1">import </span><span class="s0">pandas </span><span class="s1">as </span><span class="s0">pd</span>
+<span class="s1">import </span><span class="s0">numpy </span><span class="s1">as </span><span class="s0">np</span>
+<span class="s1">import </span><span class="s0">statsmodels</span><span class="s2">.</span><span class="s0">api </span><span class="s1">as </span><span class="s0">sm</span>
+<span class="s1">import </span><span class="s0">matplotlib</span><span class="s2">.</span><span class="s0">pyplot </span><span class="s1">as </span><span class="s0">plt</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 1. CARREGAMENTO DOS DADOS</span>
+<span class="s3"># =========================</span>
+<span class="s0">pop </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">read_csv</span><span class="s2">(</span><span class="s4">&quot;../data/processed/pop_municipal_corrigido_anual_ibge.csv&quot;</span><span class="s2">, </span><span class="s0">sep</span><span class="s2">=</span><span class="s4">&quot;;&quot;</span><span class="s2">)</span>
+<span class="s0">aluguel </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">read_csv</span><span class="s2">(</span><span class="s4">&quot;../data/processed/aluguel_fipezap.csv&quot;</span><span class="s2">)</span>
+<span class="s0">macro </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">read_csv</span><span class="s2">(</span><span class="s4">&quot;../data/processed/macro_brasil_anual_2009_2023.csv&quot;</span><span class="s2">)</span>
+<span class="s0">caged </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">read_csv</span><span class="s2">(</span><span class="s4">&quot;../data/processed/caged_2008_2022_por_cidade.csv&quot;</span><span class="s2">, </span><span class="s0">sep</span><span class="s2">=</span><span class="s4">&quot;;&quot;</span><span class="s2">)</span>
+<span class="s0">obras </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">read_csv</span><span class="s2">(</span><span class="s4">&quot;../data/raw/m2_construido_cidade_ano.csv&quot;</span><span class="s2">, </span><span class="s0">sep</span><span class="s2">=</span><span class="s4">&quot;,&quot;</span><span class="s2">)</span>
+<span class="s0">obras </span><span class="s2">= </span><span class="s0">obras</span><span class="s2">.</span><span class="s0">rename</span><span class="s2">(</span><span class="s0">columns</span><span class="s2">={</span>
+    <span class="s4">&quot;id_municipio&quot;</span><span class="s2">: </span><span class="s4">&quot;codigo_ibge&quot;</span>
+<span class="s2">})</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 2. TRATAMENTO - POPULAÇÃO</span>
+<span class="s3"># =========================</span>
+<span class="s0">pop </span><span class="s2">= </span><span class="s0">pop</span><span class="s2">.</span><span class="s0">sort_values</span><span class="s2">([</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">])</span>
+
+<span class="s3"># usar diretamente as variáveis já prontas</span>
+<span class="s0">pop </span><span class="s2">= </span><span class="s0">pop</span><span class="s2">.</span><span class="s0">rename</span><span class="s2">(</span><span class="s0">columns</span><span class="s2">={</span>
+    <span class="s4">&quot;pop_corrigida&quot;</span><span class="s2">: </span><span class="s4">&quot;populacao&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;log_pop_corr&quot;</span><span class="s2">: </span><span class="s4">&quot;log_pop&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_pop_corr&quot;</span><span class="s2">: </span><span class="s4">&quot;dlog_pop&quot;</span>
+<span class="s2">})</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 3. TRATAMENTO - OBRAS (OFERTA)</span>
+<span class="s3"># =========================</span>
+<span class="s0">obras </span><span class="s2">= </span><span class="s0">obras</span><span class="s2">.</span><span class="s0">rename</span><span class="s2">(</span><span class="s0">columns</span><span class="s2">={</span>
+    <span class="s4">&quot;id_municipio&quot;</span><span class="s2">: </span><span class="s4">&quot;codigo_ibge&quot;</span>
+<span class="s2">})</span>
+
+<span class="s0">obras </span><span class="s2">= </span><span class="s0">obras</span><span class="s2">.</span><span class="s0">sort_values</span><span class="s2">([</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">])</span>
+
+<span class="s3"># log da área construída</span>
+<span class="s0">obras</span><span class="s2">[</span><span class="s4">&quot;log_area&quot;</span><span class="s2">] = </span><span class="s0">np</span><span class="s2">.</span><span class="s0">log</span><span class="s2">(</span><span class="s0">obras</span><span class="s2">[</span><span class="s4">&quot;area_total_construida&quot;</span><span class="s2">])</span>
+
+<span class="s3"># crescimento da construção (proxy de oferta)</span>
+<span class="s0">obras</span><span class="s2">[</span><span class="s4">&quot;dlog_area&quot;</span><span class="s2">] = (</span>
+    <span class="s0">obras</span><span class="s2">.</span><span class="s0">groupby</span><span class="s2">(</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">)[</span><span class="s4">&quot;log_area&quot;</span><span class="s2">]</span>
+    <span class="s2">.</span><span class="s0">diff</span><span class="s2">()</span>
+<span class="s2">)</span>
+
+
+<span class="s3"># =========================</span>
+<span class="s3"># 4. TRATAMENTO - CAGED (DEMANDA)</span>
+<span class="s3"># =========================</span>
+<span class="s0">caged </span><span class="s2">= </span><span class="s0">caged</span><span class="s2">.</span><span class="s0">rename</span><span class="s2">(</span><span class="s0">columns</span><span class="s2">={</span>
+    <span class="s4">&quot;id_municipio&quot;</span><span class="s2">: </span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;saldo_anual&quot;</span><span class="s2">: </span><span class="s4">&quot;caged&quot;</span>
+<span class="s2">})</span>
+
+<span class="s0">caged</span><span class="s2">[</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">] = </span><span class="s0">caged</span><span class="s2">[</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">].</span><span class="s0">astype</span><span class="s2">(</span><span class="s0">int</span><span class="s2">)</span>
+
+<span class="s0">caged </span><span class="s2">= </span><span class="s0">caged</span><span class="s2">.</span><span class="s0">sort_values</span><span class="s2">([</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">])</span>
+
+
+<span class="s3"># =========================</span>
+<span class="s3"># 5. MERGES</span>
+<span class="s3"># =========================</span>
+<span class="s0">df </span><span class="s2">= </span><span class="s0">pop</span><span class="s2">.</span><span class="s0">merge</span><span class="s2">(</span>
+    <span class="s0">aluguel</span><span class="s2">,</span>
+    <span class="s0">on</span><span class="s2">=[</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">],</span>
+    <span class="s0">how</span><span class="s2">=</span><span class="s4">&quot;inner&quot;</span>
+<span class="s2">)</span>
+
+<span class="s0">df </span><span class="s2">= </span><span class="s0">df</span><span class="s2">.</span><span class="s0">merge</span><span class="s2">(</span>
+    <span class="s0">macro</span><span class="s2">,</span>
+    <span class="s0">on</span><span class="s2">=</span><span class="s4">&quot;ano&quot;</span><span class="s2">,</span>
+    <span class="s0">how</span><span class="s2">=</span><span class="s4">&quot;left&quot;</span>
+<span class="s2">)</span>
+
+<span class="s0">df </span><span class="s2">= </span><span class="s0">df</span><span class="s2">.</span><span class="s0">merge</span><span class="s2">(</span>
+    <span class="s0">caged</span><span class="s2">,</span>
+    <span class="s0">on</span><span class="s2">=[</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">],</span>
+    <span class="s0">how</span><span class="s2">=</span><span class="s4">&quot;left&quot;</span>
+<span class="s2">)</span>
+
+<span class="s0">df </span><span class="s2">= </span><span class="s0">df</span><span class="s2">.</span><span class="s0">merge</span><span class="s2">(</span>
+    <span class="s0">obras</span><span class="s2">[[</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">, </span><span class="s4">&quot;dlog_area&quot;</span><span class="s2">]],</span>
+    <span class="s0">on</span><span class="s2">=[</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">],</span>
+    <span class="s0">how</span><span class="s2">=</span><span class="s4">&quot;left&quot;</span>
+<span class="s2">)</span>
+
+
+<span class="s3"># =========================</span>
+<span class="s3"># 6. FEATURE ENGINEERING</span>
+<span class="s3"># =========================</span>
+
+<span class="s3"># CAGED per capita (demanda)</span>
+<span class="s0">df</span><span class="s2">[</span><span class="s4">&quot;caged_per_capita&quot;</span><span class="s2">] = </span><span class="s0">df</span><span class="s2">[</span><span class="s4">&quot;caged&quot;</span><span class="s2">] / </span><span class="s0">df</span><span class="s2">[</span><span class="s4">&quot;populacao&quot;</span><span class="s2">]</span>
+
+<span class="s3"># log do CAGED (opcional)</span>
+<span class="s0">df</span><span class="s2">[</span><span class="s4">&quot;log_caged&quot;</span><span class="s2">] = </span><span class="s0">np</span><span class="s2">.</span><span class="s0">log</span><span class="s2">(</span><span class="s0">df</span><span class="s2">[</span><span class="s4">&quot;caged&quot;</span><span class="s2">].</span><span class="s0">abs</span><span class="s2">() + </span><span class="s5">1</span><span class="s2">)</span>
+
+
+<span class="s3"># =========================</span>
+<span class="s3"># 7. SELEÇÃO FINAL</span>
+<span class="s3"># =========================</span>
+<span class="s0">df_final </span><span class="s2">= </span><span class="s0">df</span><span class="s2">[[</span>
+    <span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;cidade&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;ano&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;populacao&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;log_pop&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_pop&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;caged_per_capita&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_area&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">df_final </span><span class="s2">= </span><span class="s0">df_final</span><span class="s2">.</span><span class="s0">sort_values</span><span class="s2">([</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">])</span>
+
+<span class="s0">df_final</span><span class="s2">[</span><span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">] = (</span>
+    <span class="s0">df_final</span><span class="s2">.</span><span class="s0">groupby</span><span class="s2">(</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">)[</span><span class="s4">&quot;dlog_pop&quot;</span><span class="s2">].</span><span class="s0">shift</span><span class="s2">(</span><span class="s5">1</span><span class="s2">)</span>
+<span class="s2">)</span>
+<span class="s0">df_final</span><span class="s2">[</span><span class="s4">&quot;dlog_area_lag1&quot;</span><span class="s2">] = </span><span class="s0">df_final</span><span class="s2">.</span><span class="s0">groupby</span><span class="s2">(</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">)[</span><span class="s4">&quot;dlog_area&quot;</span><span class="s2">].</span><span class="s0">shift</span><span class="s2">(</span><span class="s5">1</span><span class="s2">)</span>
+
+
+<span class="s0">df_model </span><span class="s2">= </span><span class="s0">df_final</span><span class="s2">.</span><span class="s0">dropna</span><span class="s2">()</span>
+
+
+<span class="s3"># remover apenas observações incompletas</span>
+<span class="s0">df_final </span><span class="s2">= </span><span class="s0">df_final</span><span class="s2">.</span><span class="s0">dropna</span><span class="s2">()</span>
+
+
+<span class="s3"># =========================</span>
+<span class="s3"># 8. AJUSTES FINAIS</span>
+<span class="s3"># =========================</span>
+<span class="s0">df_final </span><span class="s2">= </span><span class="s0">df_final</span><span class="s2">.</span><span class="s0">rename</span><span class="s2">(</span><span class="s0">columns</span><span class="s2">={</span>
+    <span class="s4">&quot;nome_municipio&quot;</span><span class="s2">: </span><span class="s4">&quot;cidade&quot;</span>
+<span class="s2">})</span>
+
+
+<span class="s3"># =========================</span>
+<span class="s3"># 9. EXPORTAÇÃO</span>
+<span class="s3"># =========================</span>
+<span class="s0">df_final</span><span class="s2">.</span><span class="s0">to_csv</span><span class="s2">(</span>
+    <span class="s4">&quot;../data/processed/dataset_final_aluguel.csv&quot;</span><span class="s2">,</span>
+    <span class="s0">index</span><span class="s2">=</span><span class="s1">False</span>
+<span class="s2">)</span><hr class="ls0"><span class="s0">#%% md 
+</span><hr class="ls0"><span class="s0">#%% 
+X </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;caged_per_capita&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_area&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">add_constant</span><span class="s2">(</span><span class="s0">X</span><span class="s2">)</span>
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">model </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">OLS</span><span class="s2">(</span><span class="s0">y</span><span class="s2">, </span><span class="s0">X</span><span class="s2">).</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">cov_type</span><span class="s2">=</span><span class="s4">&quot;HC3&quot;</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">model</span><span class="s2">.</span><span class="s0">summary</span><span class="s2">())</span><hr class="ls0"><span class="s0">#%% 
+X </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;caged_per_capita&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_area_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">add_constant</span><span class="s2">(</span><span class="s0">X</span><span class="s2">)</span>
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">model </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">OLS</span><span class="s2">(</span><span class="s0">y</span><span class="s2">, </span><span class="s0">X</span><span class="s2">).</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">cov_type</span><span class="s2">=</span><span class="s4">&quot;HC3&quot;</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">model</span><span class="s2">.</span><span class="s0">summary</span><span class="s2">())</span><hr class="ls0"><span class="s0">#%% 
+</span>
+<span class="s0">X </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;caged_per_capita&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_area_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">add_constant</span><span class="s2">(</span><span class="s0">X</span><span class="s2">)</span>
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">model </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">OLS</span><span class="s2">(</span><span class="s0">y</span><span class="s2">, </span><span class="s0">X</span><span class="s2">).</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">cov_type</span><span class="s2">=</span><span class="s4">&quot;HC3&quot;</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">model</span><span class="s2">.</span><span class="s0">summary</span><span class="s2">())</span><hr class="ls0"><span class="s0">#%% md 
+$$ 
+dlog_aluguel_{it} = \beta_0 + \beta_1 dlog_pop_{i,t-1} + \beta_2 caged_pc_{it} + \beta_3 selic_t + \beta_4 d_ic_t + \beta_5 dlog_incc_{t-1} + \beta_6 dlog_area_{i,t-1} + \varepsilon_{it} 
+$$ 
+ 
+📊 Justificativa 
+ 
+O modelo final adota a variável de oferta com uma defasagem de um período, por apresentar melhor ajuste estatístico (maior R² e menor AIC), além de maior aderência teórica, dado que a oferta imobiliária impacta o mercado de aluguel com defasagem temporal. Modelos com defasagem contemporânea ou maior defasagem (dois períodos) apresentaram desempenho inferior. 
+ 
+Modelo final: 
+ <hr class="ls0">#%% 
+X </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;caged_per_capita&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_area_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">add_constant</span><span class="s2">(</span><span class="s0">X</span><span class="s2">)</span>
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">model </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">OLS</span><span class="s2">(</span><span class="s0">y</span><span class="s2">, </span><span class="s0">X</span><span class="s2">).</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">cov_type</span><span class="s2">=</span><span class="s4">&quot;HC3&quot;</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">model</span><span class="s2">.</span><span class="s0">summary</span><span class="s2">())</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">import </span><span class="s0">statsmodels</span><span class="s2">.</span><span class="s0">api </span><span class="s1">as </span><span class="s0">sm</span>
+<span class="s1">from </span><span class="s0">statsmodels</span><span class="s2">.</span><span class="s0">stats</span><span class="s2">.</span><span class="s0">diagnostic </span><span class="s1">import </span><span class="s0">het_breuschpagan</span>
+<span class="s1">from </span><span class="s0">scipy </span><span class="s1">import </span><span class="s0">stats</span>
+
+<span class="s3"># modelo final econométrico</span>
+<span class="s0">X </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">add_constant</span><span class="s2">(</span><span class="s0">X</span><span class="s2">)</span>
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">model_sm </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">OLS</span><span class="s2">(</span><span class="s0">y</span><span class="s2">, </span><span class="s0">X</span><span class="s2">).</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">cov_type</span><span class="s2">=</span><span class="s4">&quot;HC3&quot;</span><span class="s2">)</span>
+
+<span class="s3"># resíduos</span>
+<span class="s0">residuos </span><span class="s2">= </span><span class="s0">model_sm</span><span class="s2">.</span><span class="s0">resid</span>
+<span class="s0">X_ols </span><span class="s2">= </span><span class="s0">model_sm</span><span class="s2">.</span><span class="s0">model</span><span class="s2">.</span><span class="s0">exog</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># TESTES</span>
+<span class="s3"># =========================</span>
+
+<span class="s3"># Heterocedasticidade</span>
+<span class="s0">bp </span><span class="s2">= </span><span class="s0">het_breuschpagan</span><span class="s2">(</span><span class="s0">residuos</span><span class="s2">, </span><span class="s0">X_ols</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;Breusch-Pagan:&quot;</span><span class="s2">, </span><span class="s0">bp</span><span class="s2">)</span>
+
+<span class="s3"># Normalidade</span>
+<span class="s0">jb </span><span class="s2">= </span><span class="s0">stats</span><span class="s2">.</span><span class="s0">jarque_bera</span><span class="s2">(</span><span class="s0">residuos</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;Jarque-Bera:&quot;</span><span class="s2">, </span><span class="s0">jb</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">model_sm</span><span class="s2">.</span><span class="s0">summary</span><span class="s2">())</span><hr class="ls0"><span class="s0">#%% md 
+## VIF 
+O VIF mede se uma variável explicativa está altamente correlacionada com as outras. <hr class="ls0">#%% 
+</span><span class="s1">from </span><span class="s0">statsmodels</span><span class="s2">.</span><span class="s0">stats</span><span class="s2">.</span><span class="s0">outliers_influence </span><span class="s1">import </span><span class="s0">variance_inflation_factor</span>
+<span class="s1">import </span><span class="s0">pandas </span><span class="s1">as </span><span class="s0">pd</span>
+
+<span class="s3"># mesmas variáveis do modelo final (SEM o y)</span>
+<span class="s0">X </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;caged_per_capita&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_area_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s3"># adicionar constante</span>
+<span class="s0">X </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">add_constant</span><span class="s2">(</span><span class="s0">X</span><span class="s2">)</span>
+
+<span class="s3"># calcular VIF</span>
+<span class="s0">vif </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">DataFrame</span><span class="s2">()</span>
+<span class="s0">vif</span><span class="s2">[</span><span class="s4">&quot;variavel&quot;</span><span class="s2">] = </span><span class="s0">X</span><span class="s2">.</span><span class="s0">columns</span>
+<span class="s0">vif</span><span class="s2">[</span><span class="s4">&quot;VIF&quot;</span><span class="s2">] = [</span><span class="s0">variance_inflation_factor</span><span class="s2">(</span><span class="s0">X</span><span class="s2">.</span><span class="s0">values</span><span class="s2">, </span><span class="s0">i</span><span class="s2">) </span><span class="s1">for </span><span class="s0">i </span><span class="s1">in </span><span class="s0">range</span><span class="s2">(</span><span class="s0">X</span><span class="s2">.</span><span class="s0">shape</span><span class="s2">[</span><span class="s5">1</span><span class="s2">])]</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">vif</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% md 
+</span>
+<span class="s0">#  **2. Interpretação variável por variável** 
+ 
+| Variável         | VIF  | Diagnóstico | 
+| ---------------- | ---- | ----------- | 
+| dlog_pop_lag1    | 1.09 | ✅ Excelente | 
+| caged_per_capita | 2.04 | ✅ Muito bom | 
+| selic_media      | 5.87 | ⚠️ Moderado | 
+| d_ic_br          | 3.56 | ✅ Ok        | 
+| dlog_incc_lag1   | 5.70 | ⚠️ Moderado | 
+| dlog_area_lag1   | 1.01 | ✅ Excelente | 
+ 
+--- 
+ 
+##  Multicolinearidade moderada: 
+ 
+* `selic_media` (~5.87) 
+* `dlog_incc_lag1` (~5.70) 
+ 
+ 
+### Diagnóstico de Multicolinearidade 
+ 
+&gt; O teste de multicolinearidade foi realizado por meio do Fator de Inflação da Variância (VIF). Os resultados indicam que a maioria das variáveis apresenta valores baixos de VIF, sugerindo ausência de multicolinearidade relevante. 
+&gt; 
+&gt; As variáveis macroeconômicas, em especial a taxa SELIC e o custo da construção (INCC), apresentaram valores moderados de VIF, próximos de 6, o que é esperado devido à correlação entre indicadores econômicos agregados. 
+&gt; 
+&gt; No entanto, tais valores permanecem abaixo dos limites críticos usualmente adotados na literatura, não comprometendo a estabilidade das estimativas nem a interpretação dos coeficientes. 
+ 
+&gt; O modelo apresenta níveis aceitáveis de multicolinearidade, sem evidências de problemas que comprometam a validade dos resultados. 
+ <hr class="ls0">#%% md 
+## Stepwise (AIC) 
+Método automático que testa combinações de variáveis e escolhe o modelo com menor AIC. <hr class="ls0">#%% 
+</span><span class="s1">from </span><span class="s0">src</span><span class="s2">.</span><span class="s0">pre_process</span><span class="s2">.</span><span class="s0">stepwise </span><span class="s1">import </span><span class="s0">stepwise_selection</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;caged_per_capita&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_area_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">best_vars </span><span class="s2">= </span><span class="s0">stepwise_selection</span><span class="s2">(</span><span class="s0">X</span><span class="s2">, </span><span class="s0">y</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;Variáveis selecionadas:&quot;</span><span class="s2">, </span><span class="s0">best_vars</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% md 
+## MSE 
+ 
+O SequentialFeatureSelector (SFS) é um algoritmo de seleção de características do tipo wrapper que adiciona ou remove colunas de forma iterativa para otimizar o desempenho de um modelo. Quando utilizado em problemas de regressão, o Erro Quadrático Médio (MSE) é uma das métricas mais comuns para avaliar essas combinações de características <hr class="ls0">#%% 
+</span><span class="s1">from </span><span class="s0">mlxtend</span><span class="s2">.</span><span class="s0">feature_selection </span><span class="s1">import </span><span class="s0">SequentialFeatureSelector</span>
+<span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">linear_model </span><span class="s1">import </span><span class="s0">LinearRegression</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;caged_per_capita&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_area_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">model </span><span class="s2">= </span><span class="s0">LinearRegression</span><span class="s2">()</span>
+
+<span class="s0">sfs </span><span class="s2">= </span><span class="s0">SequentialFeatureSelector</span><span class="s2">(</span>
+    <span class="s0">model</span><span class="s2">,</span>
+    <span class="s0">k_features</span><span class="s2">=</span><span class="s4">'best'</span><span class="s2">,</span>
+    <span class="s0">forward</span><span class="s2">=</span><span class="s1">False</span><span class="s2">,  </span><span class="s3"># backward (igual seu caso)</span>
+    <span class="s0">scoring</span><span class="s2">=</span><span class="s4">'neg_mean_squared_error'</span><span class="s2">,</span>
+    <span class="s0">cv</span><span class="s2">=</span><span class="s5">0</span>
+<span class="s2">)</span>
+
+<span class="s0">sfs </span><span class="s2">= </span><span class="s0">sfs</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">X</span><span class="s2">, </span><span class="s0">y</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;Variáveis selecionadas:&quot;</span><span class="s2">, </span><span class="s0">list</span><span class="s2">(</span><span class="s0">sfs</span><span class="s2">.</span><span class="s0">k_feature_names_</span><span class="s2">))</span><hr class="ls0"><span class="s0">#%% md 
+### 📊 AIC (econometria) 
+ 
+Selecionou: 
+ 
+* `dlog_pop_lag1` 
+* `selic_media` 
+* `d_ic_br` 
+* `dlog_incc_lag1` 
+ 
+👉 Modelo **mais enxuto e interpretável** 
+ 
+--- 
+ 
+### 🤖 MSE (machine learning) 
+ 
+Selecionou: 
+ 
+* Todas as variáveis 
+ 
+👉 Modelo **mais preditivo** 
+ 
+--- 
+ 
+## 🏗️ **3. Estrutura ideal do seu TCC** 
+ 
+### 🔹 **Modelo 1 — Econométrico (PRINCIPAL)** 
+ 
+👉 Use o modelo AIC: 
+ 
+```python 
+[ 
+    &quot;dlog_pop_lag1&quot;, 
+    &quot;selic_media&quot;, 
+    &quot;d_ic_br&quot;, 
+    &quot;dlog_incc_lag1&quot; 
+] 
+``` 
+ 
+--- 
+ 
+#### 💡 Interpretação: 
+ 
+Esse modelo responde sua pergunta: 
+ 
+&gt; **Como a migração (população) impacta o aluguel?** 
+ 
+✔️ Limpo 
+✔️ Interpretável 
+✔️ Coerente teoricamente 
+ 
+--- 
+ 
+### 🔹 **Modelo 2 — Completo (teórico)** 
+ 
+👉 Seu modelo original: 
+ 
+```python 
+[ 
+    &quot;dlog_pop_lag1&quot;, 
+    &quot;caged_per_capita&quot;, 
+    &quot;selic_media&quot;, 
+    &quot;d_ic_br&quot;, 
+    &quot;dlog_incc_lag1&quot;, 
+    &quot;dlog_area_lag1&quot; 
+] 
+``` 
+ 
+👉 Serve para: 
+ 
+* mostrar robustez 
+* justificar variáveis 
+ 
+--- 
+ 
+### 🔹 **Modelo 3 — Machine Learning** 
+ 
+👉 Modelo MSE (todas variáveis) 
+ 
+👉 Serve para: 
+ 
+* previsão 
+* comparação com econometria 
+ 
+--- 
+ 
+## 🔥 **4. O insight MAIS FORTE do seu TCC** 
+ 
+&gt; Modelos econométricos e de machine learning apresentam critérios distintos de seleção de variáveis, refletindo o trade-off entre interpretabilidade e capacidade preditiva. 
+ 
+--- 
+ 
+## 📌 **5. Resposta direta à sua pergunta de pesquisa** 
+ 
+👉 Sua pergunta: 
+ 
+&gt; Como a migração impacta o aluguel? 
+ 
+--- 
+ 
+### 💥 Resposta baseada no modelo AIC: 
+ 
+&gt; O crescimento populacional (proxy de migração) apresenta efeito positivo e estatisticamente significativo sobre o crescimento dos aluguéis, mesmo após o controle por variáveis macroeconômicas. 
+ 
+--- 
+ 
+#### 📄 Seleção de Variáveis 
+ 
+&gt; Foram utilizados dois critérios de seleção de variáveis. O critério de informação de Akaike (AIC), tradicional na literatura econométrica, resultou em um modelo mais parcimonioso, mantendo apenas variáveis estatisticamente relevantes. 
+&gt; 
+&gt; Por outro lado, um procedimento baseado em erro quadrático médio (MSE), associado a técnicas de machine learning, indicou a inclusão de todas as variáveis disponíveis, priorizando a capacidade preditiva do modelo. 
+&gt; 
+&gt; Essa diferença evidencia o trade-off entre interpretabilidade e desempenho preditivo, sendo ambos os modelos utilizados de forma complementar na análise. 
+ 
+--- 
+ 
+👉 como será usado: 
+ 
+* **AIC → modelo principal (causalidade)** 
+* **MSE → modelo complementar (previsão)** 
+ <hr class="ls0">#%% md 
+# Painel 
+ 
+ 
+# 🧱 **3. Modelo que você vai estimar** 
+ 
+## 📌 Especificação: 
+ 
+$$ 
+dlog\_aluguel_{it} = 
+\beta_1 dlog\_pop_{i,t-1} + 
+\beta_2 selic_t + 
+\beta_3 d\_ic\_br_t + 
+\beta_4 dlog\_incc_{t-1} + 
+\alpha_i + \varepsilon_{it} 
+$$ 
+ 
+Onde: 
+ 
+$$ \alpha_i $$ é o efeito fixo da cidade <hr class="ls0">#%% 
+</span><span class="s1">from </span><span class="s0">linearmodels</span><span class="s2">.</span><span class="s0">panel </span><span class="s1">import </span><span class="s0">PanelOLS</span>
+
+<span class="s3"># definir índice de painel</span>
+<span class="s0">df_panel </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">.</span><span class="s0">set_index</span><span class="s2">([</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">])</span>
+
+<span class="s3"># variáveis</span>
+<span class="s0">X </span><span class="s2">= </span><span class="s0">df_panel</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_panel</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s3"># adicionar constante</span>
+<span class="s0">X </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">add_constant</span><span class="s2">(</span><span class="s0">X</span><span class="s2">)</span>
+
+<span class="s3"># modelo com efeitos fixos (cidade)</span>
+<span class="s0">model_fe </span><span class="s2">= </span><span class="s0">PanelOLS</span><span class="s2">(</span><span class="s0">y</span><span class="s2">, </span><span class="s0">X</span><span class="s2">, </span><span class="s0">entity_effects</span><span class="s2">=</span><span class="s1">True</span><span class="s2">)</span>
+
+<span class="s0">result_fe </span><span class="s2">= </span><span class="s0">model_fe</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">cov_type</span><span class="s2">=</span><span class="s4">&quot;robust&quot;</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">result_fe</span><span class="s2">.</span><span class="s0">summary</span><span class="s2">)</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">from </span><span class="s0">linearmodels</span><span class="s2">.</span><span class="s0">panel </span><span class="s1">import </span><span class="s0">RandomEffects</span>
+
+<span class="s3"># dados em painel</span>
+<span class="s0">df_panel </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">.</span><span class="s0">set_index</span><span class="s2">([</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">])</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">df_panel</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_panel</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s3"># adicionar constante</span>
+<span class="s0">X </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">add_constant</span><span class="s2">(</span><span class="s0">X</span><span class="s2">)</span>
+
+<span class="s3"># modelo RE</span>
+<span class="s0">model_re </span><span class="s2">= </span><span class="s0">RandomEffects</span><span class="s2">(</span><span class="s0">y</span><span class="s2">, </span><span class="s0">X</span><span class="s2">)</span>
+<span class="s0">result_re </span><span class="s2">= </span><span class="s0">model_re</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">cov_type</span><span class="s2">=</span><span class="s4">&quot;robust&quot;</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">result_re</span><span class="s2">.</span><span class="s0">summary</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">from </span><span class="s0">linearmodels</span><span class="s2">.</span><span class="s0">panel </span><span class="s1">import </span><span class="s0">compare</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">compare</span><span class="s2">({</span>
+    <span class="s4">&quot;FE&quot;</span><span class="s2">: </span><span class="s0">result_fe</span><span class="s2">,</span>
+    <span class="s4">&quot;RE&quot;</span><span class="s2">: </span><span class="s0">result_re</span>
+<span class="s2">}))</span><hr class="ls0"><span class="s0">#%% md 
+</span><hr class="ls0"><span class="s0">#%% md 
+Apesar da similaridade nos indicadores de ajuste, como o R² e a estatística F, os modelos de efeitos fixos e aleatórios apresentam diferenças relevantes nos coeficientes estimados, especialmente para a variável de crescimento populacional. 
+ 
+Isso evidencia que a escolha do modelo não deve ser baseada apenas na capacidade preditiva, mas também na consistência dos estimadores, uma vez que o modelo de efeitos aleatórios pode estar sujeito a viés caso a hipótese de independência entre efeitos individuais e variáveis explicativas não seja satisfeita. <hr class="ls0">#%% md 
+Os resultados indicam que, embora exista uma associação positiva entre crescimento populacional e aluguéis na análise agregada, essa relação não se mantém quando se controlam características fixas dos municípios. 
+ 
+Isso sugere que o impacto da população sobre os preços de aluguel pode estar mais associado a diferenças estruturais entre cidades do que a variações ao longo do tempo dentro de cada município. <hr class="ls0">#%% md 
+</span><hr class="ls0"><span class="s0">#%% 
+df_ext </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">.</span><span class="s0">copy</span><span class="s2">()</span>
+
+<span class="s0">df_ext</span><span class="s2">[</span><span class="s4">&quot;dlog_pop_lag3&quot;</span><span class="s2">] = (</span>
+    <span class="s0">df_ext</span><span class="s2">.</span><span class="s0">groupby</span><span class="s2">(</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">)[</span><span class="s4">&quot;dlog_pop&quot;</span><span class="s2">].</span><span class="s0">shift</span><span class="s2">(</span><span class="s5">3</span><span class="s2">)</span>
+<span class="s2">)</span>
+
+<span class="s0">df_ext</span><span class="s2">[</span><span class="s4">&quot;dlog_pop_3y&quot;</span><span class="s2">] = (</span>
+    <span class="s0">df_ext</span><span class="s2">.</span><span class="s0">groupby</span><span class="s2">(</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">)[</span><span class="s4">&quot;log_pop&quot;</span><span class="s2">].</span><span class="s0">diff</span><span class="s2">(</span><span class="s5">3</span><span class="s2">)</span>
+<span class="s2">)</span>
+<span class="s0">df_ext </span><span class="s2">= </span><span class="s0">df_ext</span><span class="s2">.</span><span class="s0">dropna</span><span class="s2">()</span>
+<hr class="ls0"><span class="s0">#%% 
+X </span><span class="s2">= </span><span class="s0">df_ext</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag3&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">add_constant</span><span class="s2">(</span><span class="s0">X</span><span class="s2">)</span>
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_ext</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">model </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">OLS</span><span class="s2">(</span><span class="s0">y</span><span class="s2">, </span><span class="s0">X</span><span class="s2">).</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">cov_type</span><span class="s2">=</span><span class="s4">&quot;HC3&quot;</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s0">model</span><span class="s2">.</span><span class="s0">summary</span><span class="s2">())</span><hr class="ls0"><span class="s0">#%% 
+X </span><span class="s2">= </span><span class="s0">df_ext</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_3y&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">add_constant</span><span class="s2">(</span><span class="s0">X</span><span class="s2">)</span>
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_ext</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">model </span><span class="s2">= </span><span class="s0">sm</span><span class="s2">.</span><span class="s0">OLS</span><span class="s2">(</span><span class="s0">y</span><span class="s2">, </span><span class="s0">X</span><span class="s2">).</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">cov_type</span><span class="s2">=</span><span class="s4">&quot;HC3&quot;</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s0">model</span><span class="s2">.</span><span class="s0">summary</span><span class="s2">())</span><hr class="ls0"><span class="s0">#%% 
+df_fe </span><span class="s2">= </span><span class="s0">df_ext</span><span class="s2">.</span><span class="s0">copy</span><span class="s2">()</span>
+<span class="s0">df_fe </span><span class="s2">= </span><span class="s0">df_fe</span><span class="s2">.</span><span class="s0">set_index</span><span class="s2">([</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">])</span>
+<span class="s0">df_fe </span><span class="s2">= </span><span class="s0">df_fe</span><span class="s2">.</span><span class="s0">dropna</span><span class="s2">()</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">from </span><span class="s0">linearmodels</span><span class="s2">.</span><span class="s0">panel </span><span class="s1">import </span><span class="s0">PanelOLS</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">df_fe</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_3y&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_fe</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">model_fe_3y </span><span class="s2">= </span><span class="s0">PanelOLS</span><span class="s2">(</span><span class="s0">y</span><span class="s2">, </span><span class="s0">X</span><span class="s2">, </span><span class="s0">entity_effects</span><span class="s2">=</span><span class="s1">True</span><span class="s2">)</span>
+<span class="s0">result_fe_3y </span><span class="s2">= </span><span class="s0">model_fe_3y</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">cov_type</span><span class="s2">=</span><span class="s4">&quot;robust&quot;</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">result_fe_3y</span><span class="s2">.</span><span class="s0">summary</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% md 
+No modelo pooled OLS, um aumento de 1% na população está associado a um aumento aproximado de 0,9% nos preços de aluguel. No entanto, essa relação não se mantém nos modelos de efeitos fixos, nos quais o coeficiente não é estatisticamente significativo. 
+ 
+Isso sugere que a associação observada no modelo pooled pode refletir, em grande parte, diferenças estruturais entre municípios, e não necessariamente um efeito causal decorrente de variações populacionais ao longo do tempo. 
+ 
+Além disso, os intervalos de confiança estimados indicam que o impacto da população sobre os aluguéis no curto prazo é incerto e pode variar amplamente, não sendo possível identificar um efeito médio robusto. 
+ 
+ 
+relação entre população e aluguel aparece quando comparamos cidades diferentes, mas não quando analisamos a evolução dentro da mesma cidade ao longo do tempo. <hr class="ls0">#%% md 
+## XBOOST <hr class="ls0">#%% 
+</span><span class="s1">from </span><span class="s0">xgboost </span><span class="s1">import </span><span class="s0">XGBRegressor</span>
+<span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">model_selection </span><span class="s1">import </span><span class="s0">train_test_split</span>
+<span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">metrics </span><span class="s1">import </span><span class="s0">mean_squared_error</span>
+
+<span class="s3"># dados</span>
+<span class="s0">X </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[[</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;caged_per_capita&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_area_lag1&quot;</span>
+<span class="s2">]]</span>
+
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s3"># split</span>
+<span class="s0">X_train</span><span class="s2">, </span><span class="s0">X_test</span><span class="s2">, </span><span class="s0">y_train</span><span class="s2">, </span><span class="s0">y_test </span><span class="s2">= </span><span class="s0">train_test_split</span><span class="s2">(</span>
+    <span class="s0">X</span><span class="s2">, </span><span class="s0">y</span><span class="s2">, </span><span class="s0">test_size</span><span class="s2">=</span><span class="s5">0.2</span><span class="s2">, </span><span class="s0">random_state</span><span class="s2">=</span><span class="s5">42</span>
+<span class="s2">)</span>
+
+<span class="s3"># modelo</span>
+<span class="s0">xgb </span><span class="s2">= </span><span class="s0">XGBRegressor</span><span class="s2">(</span>
+    <span class="s0">n_estimators</span><span class="s2">=</span><span class="s5">100</span><span class="s2">,</span>
+    <span class="s0">max_depth</span><span class="s2">=</span><span class="s5">3</span><span class="s2">,</span>
+    <span class="s0">learning_rate</span><span class="s2">=</span><span class="s5">0.1</span><span class="s2">,</span>
+    <span class="s0">random_state</span><span class="s2">=</span><span class="s5">42</span>
+<span class="s2">)</span>
+
+<span class="s3"># treino</span>
+<span class="s0">xgb</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">X_train</span><span class="s2">, </span><span class="s0">y_train</span><span class="s2">)</span>
+
+<span class="s3"># previsão</span>
+<span class="s0">y_pred </span><span class="s2">= </span><span class="s0">xgb</span><span class="s2">.</span><span class="s0">predict</span><span class="s2">(</span><span class="s0">X_test</span><span class="s2">)</span>
+
+<span class="s3"># erro</span>
+<span class="s0">mse </span><span class="s2">= </span><span class="s0">mean_squared_error</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">y_pred</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;MSE:&quot;</span><span class="s2">, </span><span class="s0">mse</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">linear_model </span><span class="s1">import </span><span class="s0">LinearRegression</span>
+
+<span class="s0">ols </span><span class="s2">= </span><span class="s0">LinearRegression</span><span class="s2">()</span>
+<span class="s0">ols</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">X_train</span><span class="s2">, </span><span class="s0">y_train</span><span class="s2">)</span>
+
+<span class="s0">y_pred_ols </span><span class="s2">= </span><span class="s0">ols</span><span class="s2">.</span><span class="s0">predict</span><span class="s2">(</span><span class="s0">X_test</span><span class="s2">)</span>
+
+<span class="s0">mse_ols </span><span class="s2">= </span><span class="s0">mean_squared_error</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">y_pred_ols</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;MSE OLS:&quot;</span><span class="s2">, </span><span class="s0">mse_ols</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">import </span><span class="s0">pandas </span><span class="s1">as </span><span class="s0">pd</span>
+
+<span class="s0">importance </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">Series</span><span class="s2">(</span>
+    <span class="s0">xgb</span><span class="s2">.</span><span class="s0">feature_importances_</span><span class="s2">,</span>
+    <span class="s0">index</span><span class="s2">=</span><span class="s0">X</span><span class="s2">.</span><span class="s0">columns</span>
+<span class="s2">).</span><span class="s0">sort_values</span><span class="s2">(</span><span class="s0">ascending</span><span class="s2">=</span><span class="s1">False</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">importance</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% md 
+O modelo XGBoost apresentou desempenho inferior ao modelo linear OLS em termos de erro quadrático médio, indicando que a inclusão de não linearidades não melhora a capacidade preditiva. 
+ 
+A análise de importância das variáveis revelou que o principal fator explicativo é o custo da construção civil (INCC), seguido pela taxa de juros e pelo nível de atividade econômica. 
+ 
+A variável de crescimento populacional apresentou baixa importância relativa, corroborando os resultados obtidos nos modelos econométricos. 
+ 
+ 
+mercado responde mais a custo e crédito 
+ 
+do que a pressão de demanda no curto prazo <hr class="ls0">#%% 
+</span><span class="s1">import </span><span class="s0">pandas </span><span class="s1">as </span><span class="s0">pd</span>
+
+<span class="s0">df_ml </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">.</span><span class="s0">copy</span><span class="s2">()</span>
+
+<span class="s3"># criar dummies de cidade</span>
+<span class="s0">df_ml </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">get_dummies</span><span class="s2">(</span><span class="s0">df_ml</span><span class="s2">, </span><span class="s0">columns</span><span class="s2">=[</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">], </span><span class="s0">drop_first</span><span class="s2">=</span><span class="s1">True</span><span class="s2">)</span>
+
+<span class="s0">X </span><span class="s2">= </span><span class="s0">df_ml</span><span class="s2">.</span><span class="s0">drop</span><span class="s2">(</span><span class="s0">columns</span><span class="s2">=[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">, </span><span class="s4">&quot;cidade&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">])</span>
+<span class="s0">y </span><span class="s2">= </span><span class="s0">df_ml</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">train </span><span class="s2">= </span><span class="s0">df_ml</span><span class="s2">[</span><span class="s0">df_ml</span><span class="s2">[</span><span class="s4">&quot;ano&quot;</span><span class="s2">] &lt;= </span><span class="s5">2019</span><span class="s2">]</span>
+<span class="s0">test  </span><span class="s2">= </span><span class="s0">df_ml</span><span class="s2">[</span><span class="s0">df_ml</span><span class="s2">[</span><span class="s4">&quot;ano&quot;</span><span class="s2">] &gt; </span><span class="s5">2019</span><span class="s2">]</span>
+
+<span class="s0">X_train </span><span class="s2">= </span><span class="s0">train</span><span class="s2">.</span><span class="s0">drop</span><span class="s2">(</span><span class="s0">columns</span><span class="s2">=[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">, </span><span class="s4">&quot;cidade&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">])</span>
+<span class="s0">y_train </span><span class="s2">= </span><span class="s0">train</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">X_test </span><span class="s2">= </span><span class="s0">test</span><span class="s2">.</span><span class="s0">drop</span><span class="s2">(</span><span class="s0">columns</span><span class="s2">=[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">, </span><span class="s4">&quot;cidade&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">])</span>
+<span class="s0">y_test </span><span class="s2">= </span><span class="s0">test</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">from </span><span class="s0">xgboost </span><span class="s1">import </span><span class="s0">XGBRegressor</span>
+<span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">metrics </span><span class="s1">import </span><span class="s0">mean_squared_error</span>
+
+<span class="s0">xgb_fe </span><span class="s2">= </span><span class="s0">XGBRegressor</span><span class="s2">(</span>
+    <span class="s0">n_estimators</span><span class="s2">=</span><span class="s5">200</span><span class="s2">,</span>
+    <span class="s0">max_depth</span><span class="s2">=</span><span class="s5">3</span><span class="s2">,</span>
+    <span class="s0">learning_rate</span><span class="s2">=</span><span class="s5">0.05</span><span class="s2">,</span>
+    <span class="s0">random_state</span><span class="s2">=</span><span class="s5">42</span>
+<span class="s2">)</span>
+
+<span class="s0">xgb_fe</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">X_train</span><span class="s2">, </span><span class="s0">y_train</span><span class="s2">)</span>
+
+<span class="s0">y_pred </span><span class="s2">= </span><span class="s0">xgb_fe</span><span class="s2">.</span><span class="s0">predict</span><span class="s2">(</span><span class="s0">X_test</span><span class="s2">)</span>
+
+<span class="s0">mse_fe </span><span class="s2">= </span><span class="s0">mean_squared_error</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">y_pred</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;MSE XGBoost + FE:&quot;</span><span class="s2">, </span><span class="s0">mse_fe</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">import </span><span class="s0">pandas </span><span class="s1">as </span><span class="s0">pd</span>
+
+<span class="s0">importance </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">Series</span><span class="s2">(</span>
+    <span class="s0">xgb_fe</span><span class="s2">.</span><span class="s0">feature_importances_</span><span class="s2">,</span>
+    <span class="s0">index</span><span class="s2">=</span><span class="s0">X_train</span><span class="s2">.</span><span class="s0">columns</span>
+<span class="s2">).</span><span class="s0">sort_values</span><span class="s2">(</span><span class="s0">ascending</span><span class="s2">=</span><span class="s1">False</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s0">importance</span><span class="s2">.</span><span class="s0">head</span><span class="s2">(</span><span class="s5">15</span><span class="s2">))</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">import </span><span class="s0">pandas </span><span class="s1">as </span><span class="s0">pd</span>
+<span class="s1">import </span><span class="s0">numpy </span><span class="s1">as </span><span class="s0">np</span>
+<span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">linear_model </span><span class="s1">import </span><span class="s0">LinearRegression</span>
+<span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">metrics </span><span class="s1">import </span><span class="s0">mean_squared_error</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 1. CRIAR LAG DO ALUGUEL</span>
+<span class="s3"># =========================</span>
+<span class="s0">df_model </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">.</span><span class="s0">sort_values</span><span class="s2">([</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">, </span><span class="s4">&quot;ano&quot;</span><span class="s2">])</span>
+
+<span class="s0">df_model</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel_lag1&quot;</span><span class="s2">] = (</span>
+    <span class="s0">df_model</span><span class="s2">.</span><span class="s0">groupby</span><span class="s2">(</span><span class="s4">&quot;codigo_ibge&quot;</span><span class="s2">)[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">].</span><span class="s0">shift</span><span class="s2">(</span><span class="s5">1</span><span class="s2">)</span>
+<span class="s2">)</span>
+
+<span class="s3"># remover NA gerados pelo lag</span>
+<span class="s0">df_model_ml </span><span class="s2">= </span><span class="s0">df_model</span><span class="s2">.</span><span class="s0">dropna</span><span class="s2">()</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 2. FEATURES (ATUALIZADO)</span>
+<span class="s3"># =========================</span>
+<span class="s0">features </span><span class="s2">= [</span>
+    <span class="s4">&quot;dlog_aluguel_lag1&quot;</span><span class="s2">,   </span><span class="s3"># 🔥 nova variável (mais importante)</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span>
+<span class="s2">]</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 3. SPLIT TEMPORAL</span>
+<span class="s3"># =========================</span>
+<span class="s0">train </span><span class="s2">= </span><span class="s0">df_model_ml</span><span class="s2">[</span><span class="s0">df_model_ml</span><span class="s2">[</span><span class="s4">&quot;ano&quot;</span><span class="s2">] &lt;= </span><span class="s5">2019</span><span class="s2">]</span>
+<span class="s0">test  </span><span class="s2">= </span><span class="s0">df_model_ml</span><span class="s2">[</span><span class="s0">df_model_ml</span><span class="s2">[</span><span class="s4">&quot;ano&quot;</span><span class="s2">] &gt; </span><span class="s5">2019</span><span class="s2">]</span>
+
+<span class="s0">X_train </span><span class="s2">= </span><span class="s0">train</span><span class="s2">[</span><span class="s0">features</span><span class="s2">]</span>
+<span class="s0">y_train </span><span class="s2">= </span><span class="s0">train</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">X_test </span><span class="s2">= </span><span class="s0">test</span><span class="s2">[</span><span class="s0">features</span><span class="s2">]</span>
+<span class="s0">y_test </span><span class="s2">= </span><span class="s0">test</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 4. MODELO</span>
+<span class="s3"># =========================</span>
+<span class="s0">model </span><span class="s2">= </span><span class="s0">LinearRegression</span><span class="s2">()</span>
+<span class="s0">model</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">X_train</span><span class="s2">, </span><span class="s0">y_train</span><span class="s2">)</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 5. PREVISÃO</span>
+<span class="s3"># =========================</span>
+<span class="s0">y_pred </span><span class="s2">= </span><span class="s0">model</span><span class="s2">.</span><span class="s0">predict</span><span class="s2">(</span><span class="s0">X_test</span><span class="s2">)</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 6. MÉTRICAS</span>
+<span class="s3"># =========================</span>
+<span class="s0">mse </span><span class="s2">= </span><span class="s0">mean_squared_error</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">y_pred</span><span class="s2">)</span>
+<span class="s0">rmse </span><span class="s2">= </span><span class="s0">np</span><span class="s2">.</span><span class="s0">sqrt</span><span class="s2">(</span><span class="s0">mse</span><span class="s2">)</span>
+
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;MSE previsão:&quot;</span><span class="s2">, </span><span class="s0">mse</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;RMSE:&quot;</span><span class="s2">, </span><span class="s0">rmse</span><span class="s2">)</span>
+
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">import </span><span class="s0">numpy </span><span class="s1">as </span><span class="s0">np</span>
+
+<span class="s3"># suponha um valor inicial</span>
+<span class="s0">base </span><span class="s2">= </span><span class="s5">100</span>
+
+<span class="s0">real_index </span><span class="s2">= </span><span class="s0">base </span><span class="s2">* </span><span class="s0">np</span><span class="s2">.</span><span class="s0">exp</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">.</span><span class="s0">cumsum</span><span class="s2">())</span>
+<span class="s0">pred_index </span><span class="s2">= </span><span class="s0">base </span><span class="s2">* </span><span class="s0">np</span><span class="s2">.</span><span class="s0">exp</span><span class="s2">(</span><span class="s0">pd</span><span class="s2">.</span><span class="s0">Series</span><span class="s2">(</span><span class="s0">y_pred</span><span class="s2">).</span><span class="s0">cumsum</span><span class="s2">())</span>
+
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">figure</span><span class="s2">()</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">plot</span><span class="s2">(</span><span class="s0">real_index</span><span class="s2">.</span><span class="s0">values</span><span class="s2">, </span><span class="s0">label</span><span class="s2">=</span><span class="s4">&quot;Real&quot;</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">plot</span><span class="s2">(</span><span class="s0">pred_index</span><span class="s2">.</span><span class="s0">values</span><span class="s2">, </span><span class="s0">label</span><span class="s2">=</span><span class="s4">&quot;Previsto&quot;</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">legend</span><span class="s2">()</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">title</span><span class="s2">(</span><span class="s4">&quot;Índice de aluguel (real vs previsto)&quot;</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">show</span><span class="s2">()</span><hr class="ls0"><span class="s0">#%% md 
+A inclusão de uma defasagem da variável dependente resultou em melhora significativa no desempenho preditivo do modelo, reduzindo o erro médio de aproximadamente 11,7 para 8,9 pontos percentuais. 
+ 
+Esse resultado indica a presença de persistência temporal nos preços de aluguel, sugerindo que a dinâmica do mercado apresenta inércia. 
+ 
+Métricas baseadas em erro percentual (MAPE) não foram utilizadas, devido à natureza da variável dependente, que pode assumir valores próximos de zero, gerando distorções. 
+ 
+Foram testadas diferentes especificações dinâmicas, incluindo a utilização de defasagens da variável dependente e médias móveis. 
+ 
+Os resultados indicam que a inclusão de uma defasagem simples (lag 1) apresenta melhor desempenho preditivo em comparação à média móvel, sugerindo que o mercado de aluguel responde mais fortemente a variações recentes do que a tendências suavizadas. <hr class="ls0">#%% md 
+O modelo apresenta boa capacidade de replicar a tendência de crescimento dos aluguéis, ainda que com menor precisão em períodos de maior volatilidade. <hr class="ls0">#%% 
+</span><span class="s1">import </span><span class="s0">optuna</span>
+<span class="s1">from </span><span class="s0">xgboost </span><span class="s1">import </span><span class="s0">XGBRegressor</span>
+<span class="s1">from </span><span class="s0">sklearn</span><span class="s2">.</span><span class="s0">metrics </span><span class="s1">import </span><span class="s0">mean_squared_error</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 1. DADOS (mesmo split que você já usa)</span>
+<span class="s3"># =========================</span>
+<span class="s0">features </span><span class="s2">= [</span>
+    <span class="s4">&quot;dlog_aluguel_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_pop_lag1&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;d_ic_br&quot;</span><span class="s2">,</span>
+    <span class="s4">&quot;dlog_incc_lag1&quot;</span>
+<span class="s2">]</span>
+
+<span class="s0">X_train </span><span class="s2">= </span><span class="s0">train</span><span class="s2">[</span><span class="s0">features</span><span class="s2">]</span>
+<span class="s0">y_train </span><span class="s2">= </span><span class="s0">train</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s0">X_test </span><span class="s2">= </span><span class="s0">test</span><span class="s2">[</span><span class="s0">features</span><span class="s2">]</span>
+<span class="s0">y_test </span><span class="s2">= </span><span class="s0">test</span><span class="s2">[</span><span class="s4">&quot;dlog_aluguel&quot;</span><span class="s2">]</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 2. FUNÇÃO OBJETIVO</span>
+<span class="s3"># =========================</span>
+<span class="s1">def </span><span class="s0">objective</span><span class="s2">(</span><span class="s0">trial</span><span class="s2">):</span>
+
+    <span class="s0">params </span><span class="s2">= {</span>
+        <span class="s4">&quot;n_estimators&quot;</span><span class="s2">: </span><span class="s0">trial</span><span class="s2">.</span><span class="s0">suggest_int</span><span class="s2">(</span><span class="s4">&quot;n_estimators&quot;</span><span class="s2">, </span><span class="s5">10</span><span class="s2">, </span><span class="s5">1000</span><span class="s2">),</span>
+        <span class="s4">&quot;max_depth&quot;</span><span class="s2">: </span><span class="s0">trial</span><span class="s2">.</span><span class="s0">suggest_int</span><span class="s2">(</span><span class="s4">&quot;max_depth&quot;</span><span class="s2">, </span><span class="s5">0</span><span class="s2">, </span><span class="s5">7</span><span class="s2">),</span>
+        <span class="s4">&quot;learning_rate&quot;</span><span class="s2">: </span><span class="s0">trial</span><span class="s2">.</span><span class="s0">suggest_float</span><span class="s2">(</span><span class="s4">&quot;learning_rate&quot;</span><span class="s2">, </span><span class="s5">0.001</span><span class="s2">, </span><span class="s5">0.02</span><span class="s2">),</span>
+        <span class="s4">&quot;subsample&quot;</span><span class="s2">: </span><span class="s0">trial</span><span class="s2">.</span><span class="s0">suggest_float</span><span class="s2">(</span><span class="s4">&quot;subsample&quot;</span><span class="s2">, </span><span class="s5">0.6</span><span class="s2">, </span><span class="s5">1.0</span><span class="s2">),</span>
+        <span class="s4">&quot;colsample_bytree&quot;</span><span class="s2">: </span><span class="s0">trial</span><span class="s2">.</span><span class="s0">suggest_float</span><span class="s2">(</span><span class="s4">&quot;colsample_bytree&quot;</span><span class="s2">, </span><span class="s5">0.6</span><span class="s2">, </span><span class="s5">1.0</span><span class="s2">),</span>
+        <span class="s4">&quot;gamma&quot;</span><span class="s2">: </span><span class="s0">trial</span><span class="s2">.</span><span class="s0">suggest_float</span><span class="s2">(</span><span class="s4">&quot;gamma&quot;</span><span class="s2">, </span><span class="s5">0</span><span class="s2">, </span><span class="s5">1</span><span class="s2">),</span>
+        <span class="s4">&quot;reg_lambda&quot;</span><span class="s2">: </span><span class="s0">trial</span><span class="s2">.</span><span class="s0">suggest_float</span><span class="s2">(</span><span class="s4">&quot;reg_lambda&quot;</span><span class="s2">, </span><span class="s5">0</span><span class="s2">, </span><span class="s5">5</span><span class="s2">),</span>
+        <span class="s4">&quot;random_state&quot;</span><span class="s2">: </span><span class="s5">42</span>
+    <span class="s2">}</span>
+
+    <span class="s0">model </span><span class="s2">= </span><span class="s0">XGBRegressor</span><span class="s2">(**</span><span class="s0">params</span><span class="s2">)</span>
+    <span class="s0">model</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">X_train</span><span class="s2">, </span><span class="s0">y_train</span><span class="s2">)</span>
+
+    <span class="s0">preds </span><span class="s2">= </span><span class="s0">model</span><span class="s2">.</span><span class="s0">predict</span><span class="s2">(</span><span class="s0">X_test</span><span class="s2">)</span>
+    <span class="s0">mse </span><span class="s2">= </span><span class="s0">mean_squared_error</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">preds</span><span class="s2">)</span>
+
+    <span class="s1">return </span><span class="s0">mse</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 3. RODAR OPTUNA</span>
+<span class="s3"># =========================</span>
+<span class="s0">study </span><span class="s2">= </span><span class="s0">optuna</span><span class="s2">.</span><span class="s0">create_study</span><span class="s2">(</span><span class="s0">direction</span><span class="s2">=</span><span class="s4">&quot;minimize&quot;</span><span class="s2">)</span>
+<span class="s0">study</span><span class="s2">.</span><span class="s0">optimize</span><span class="s2">(</span><span class="s0">objective</span><span class="s2">, </span><span class="s0">n_trials</span><span class="s2">=</span><span class="s5">200</span><span class="s2">)</span>
+
+<span class="s3"># =========================</span>
+<span class="s3"># 4. RESULTADOS</span>
+<span class="s3"># =========================</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;Melhor MSE:&quot;</span><span class="s2">, </span><span class="s0">study</span><span class="s2">.</span><span class="s0">best_value</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;Melhores parâmetros:&quot;</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s0">study</span><span class="s2">.</span><span class="s0">best_params</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">import </span><span class="s0">pprint</span>
+
+<span class="s0">best_model </span><span class="s2">= </span><span class="s0">XGBRegressor</span><span class="s2">(**</span><span class="s0">study</span><span class="s2">.</span><span class="s0">best_params</span><span class="s2">)</span>
+
+<span class="s0">best_model</span><span class="s2">.</span><span class="s0">fit</span><span class="s2">(</span><span class="s0">X_train</span><span class="s2">, </span><span class="s0">y_train</span><span class="s2">)</span>
+
+<span class="s0">y_pred_optuna </span><span class="s2">= </span><span class="s0">best_model</span><span class="s2">.</span><span class="s0">predict</span><span class="s2">(</span><span class="s0">X_test</span><span class="s2">)</span>
+
+<span class="s0">mse_optuna </span><span class="s2">= </span><span class="s0">mean_squared_error</span><span class="s2">(</span><span class="s0">y_test</span><span class="s2">, </span><span class="s0">y_pred_optuna</span><span class="s2">)</span>
+<span class="s0">pprint</span><span class="s2">.</span><span class="s0">pprint</span><span class="s2">(</span><span class="s0">study</span><span class="s2">.</span><span class="s0">best_params</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;MSE XGBoost + Optuna:&quot;</span><span class="s2">, </span><span class="s0">mse_optuna</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% 
+print</span><span class="s2">(</span><span class="s4">&quot;OLS:&quot;</span><span class="s2">, </span><span class="s0">mse_ols</span><span class="s2">)</span>
+<span class="s0">print</span><span class="s2">(</span><span class="s4">&quot;XGBoost + Optuna:&quot;</span><span class="s2">, </span><span class="s0">mse_optuna</span><span class="s2">)</span><hr class="ls0"><span class="s0">#%% 
+</span>
+<span class="s0">y_pred_ols </span><span class="s2">= </span><span class="s0">ols</span><span class="s2">.</span><span class="s0">predict</span><span class="s2">()</span>
+
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">figure</span><span class="s2">()</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">scatter</span><span class="s2">(</span><span class="s0">y</span><span class="s2">, </span><span class="s0">y_pred_ols</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">xlabel</span><span class="s2">(</span><span class="s4">&quot;Real&quot;</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">ylabel</span><span class="s2">(</span><span class="s4">&quot;Previsto&quot;</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">title</span><span class="s2">(</span><span class="s4">&quot;Real vs Previsto - OLS&quot;</span><span class="s2">)</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">plot</span><span class="s2">([</span><span class="s0">y</span><span class="s2">.</span><span class="s0">min</span><span class="s2">(), </span><span class="s0">y</span><span class="s2">.</span><span class="s0">max</span><span class="s2">()], [</span><span class="s0">y</span><span class="s2">.</span><span class="s0">min</span><span class="s2">(), </span><span class="s0">y</span><span class="s2">.</span><span class="s0">max</span><span class="s2">()])</span>
+<span class="s0">plt</span><span class="s2">.</span><span class="s0">show</span><span class="s2">()</span></pre>
+</body>
+</html>

@@ -3,3 +3,7 @@ numpy~=2.2.6
 matplotlib~=3.10.1
 seaborn~=0.13.2
 openpyxl~=3.1.5
+statsmodels
+linearmodels
+scikit-learn
+mlxtend

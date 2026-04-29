@@ -1,0 +1,225 @@
+<html>
+<head>
+<title>eda_aluguel.ipynb</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #bcbec4;}
+.s1 { color: #bcbec4;}
+.s2 { color: #6aab73;}
+.s3 { color: #7a7e85;}
+.s4 { color: #cf8e6d;}
+.s5 { color: #2aacb8;}
+.ls0 { height: 1px; border-width: 0; color: #43454a; background-color:#43454a}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+eda_aluguel.ipynb</font>
+</center></td></tr></table>
+<pre><span class="s0">#%% 
+</span>
+<span class="s0">cidade_ibge </span><span class="s1">= {</span>
+    <span class="s2">&quot;São Paulo&quot;</span><span class="s1">: </span><span class="s2">&quot;3550308&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Barueri&quot;</span><span class="s1">: </span><span class="s2">&quot;3505708&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Campinas&quot;</span><span class="s1">: </span><span class="s2">&quot;3509502&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Diadema&quot;</span><span class="s1">: </span><span class="s2">&quot;3513801&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Guarujá&quot;</span><span class="s1">: </span><span class="s2">&quot;3518702&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Guarulhos&quot;</span><span class="s1">: </span><span class="s2">&quot;3518801&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Osasco&quot;</span><span class="s1">: </span><span class="s2">&quot;3534401&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Praia Grande&quot;</span><span class="s1">: </span><span class="s2">&quot;3541007&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Ribeirão Preto&quot;</span><span class="s1">: </span><span class="s2">&quot;3543409&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Santo André&quot;</span><span class="s1">: </span><span class="s2">&quot;3547809&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Santos&quot;</span><span class="s1">: </span><span class="s2">&quot;3548500&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;São Bernardo do Campo&quot;</span><span class="s1">: </span><span class="s2">&quot;3548708&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;São Caetano do Sul&quot;</span><span class="s1">: </span><span class="s2">&quot;3548807&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;São José do Rio Preto&quot;</span><span class="s1">: </span><span class="s2">&quot;3549805&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;São José dos Campos&quot;</span><span class="s1">: </span><span class="s2">&quot;3549904&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;São Vicente&quot;</span><span class="s1">: </span><span class="s2">&quot;3551009&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Rio de Janeiro&quot;</span><span class="s1">: </span><span class="s2">&quot;3304557&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Niterói&quot;</span><span class="s1">: </span><span class="s2">&quot;3303302&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Belo Horizonte&quot;</span><span class="s1">: </span><span class="s2">&quot;3106200&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Betim&quot;</span><span class="s1">: </span><span class="s2">&quot;3106705&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Contagem&quot;</span><span class="s1">: </span><span class="s2">&quot;3118601&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Porto Alegre&quot;</span><span class="s1">: </span><span class="s2">&quot;4314902&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Canoas&quot;</span><span class="s1">: </span><span class="s2">&quot;4304606&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Caxias do Sul&quot;</span><span class="s1">: </span><span class="s2">&quot;4305108&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Novo Hamburgo&quot;</span><span class="s1">: </span><span class="s2">&quot;4313400&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Pelotas&quot;</span><span class="s1">: </span><span class="s2">&quot;4314408&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Santa Maria&quot;</span><span class="s1">: </span><span class="s2">&quot;4316908&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;São Leopoldo&quot;</span><span class="s1">: </span><span class="s2">&quot;4318706&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Curitiba&quot;</span><span class="s1">: </span><span class="s2">&quot;4106902&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Londrina&quot;</span><span class="s1">: </span><span class="s2">&quot;4113700&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;São José dos Pinhais&quot;</span><span class="s1">: </span><span class="s2">&quot;4125506&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Florianópolis&quot;</span><span class="s1">: </span><span class="s2">&quot;4205407&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Balneário Camboriú&quot;</span><span class="s1">: </span><span class="s2">&quot;4202008&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Blumenau&quot;</span><span class="s1">: </span><span class="s2">&quot;4202404&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Itajaí&quot;</span><span class="s1">: </span><span class="s2">&quot;4208203&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Itapema&quot;</span><span class="s1">: </span><span class="s2">&quot;4208302&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Joinville&quot;</span><span class="s1">: </span><span class="s2">&quot;4209102&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;São José&quot;</span><span class="s1">: </span><span class="s2">&quot;4216602&quot;</span><span class="s1">,   </span><span class="s3"># São José (SC)</span>
+    <span class="s2">&quot;Vitória&quot;</span><span class="s1">: </span><span class="s2">&quot;3205309&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Vila Velha&quot;</span><span class="s1">: </span><span class="s2">&quot;3205200&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Brasília&quot;</span><span class="s1">: </span><span class="s2">&quot;5300108&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Goiânia&quot;</span><span class="s1">: </span><span class="s2">&quot;5208707&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Campo Grande&quot;</span><span class="s1">: </span><span class="s2">&quot;5002704&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Cuiabá&quot;</span><span class="s1">: </span><span class="s2">&quot;5103403&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Aracaju&quot;</span><span class="s1">: </span><span class="s2">&quot;2800308&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Fortaleza&quot;</span><span class="s1">: </span><span class="s2">&quot;2304400&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;João Pessoa&quot;</span><span class="s1">: </span><span class="s2">&quot;2507507&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Maceió&quot;</span><span class="s1">: </span><span class="s2">&quot;2704302&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Natal&quot;</span><span class="s1">: </span><span class="s2">&quot;2408102&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Recife&quot;</span><span class="s1">: </span><span class="s2">&quot;2611606&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Salvador&quot;</span><span class="s1">: </span><span class="s2">&quot;2927408&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;São Luís&quot;</span><span class="s1">: </span><span class="s2">&quot;2111300&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Teresina&quot;</span><span class="s1">: </span><span class="s2">&quot;2211001&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Jaboatão dos Guararapes&quot;</span><span class="s1">: </span><span class="s2">&quot;2607901&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Belém&quot;</span><span class="s1">: </span><span class="s2">&quot;1501402&quot;</span><span class="s1">,</span>
+    <span class="s2">&quot;Manaus&quot;</span><span class="s1">: </span><span class="s2">&quot;1302603&quot;</span>
+<span class="s1">}</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s4">from </span><span class="s0">src</span><span class="s1">.</span><span class="s0">pre_process</span><span class="s1">.</span><span class="s0">preprocess_aluguel_fipezap </span><span class="s4">import  </span><span class="s0">preprocessar_fipezap_anual</span>
+
+<span class="s0">preprocessar_fipezap_anual</span><span class="s1">(</span><span class="s2">'../data/raw/aluguel_por_cidade_fipezap.xlsx'</span><span class="s1">, </span><span class="s2">'../data/processed/aluguel_fipezap.csv'</span><span class="s1">, </span><span class="s0">cidade_ibge</span><span class="s1">)</span>
+<hr class="ls0"><span class="s0">#%% md 
+Com o agrupamento muitas cidades perderam dados, isso faz com que o dataset seja diminuido. 
+ 
+(Aracaju, false)    3 
+(Barueri, false)    7 
+(Belo Horizonte, false) 10 
+(Belém, false)  3 
+(Brasília, false)   11 
+(Campinas, false)   11 
+(Campo Grande, false)   3 
+(Cuiabá, false) 3 
+(Curitiba, false)   11 
+(Florianópolis, false)  9 
+(Fortaleza, false)  9 
+(Goiânia, false)    9 
+(Guarulhos, false)  7 
+(Joinville, false)  7 
+(João Pessoa, false)    3 
+(Maceió, false) 3 
+(Manaus, false) 3 
+(Natal, false)  3 
+(Niterói, false)    9 
+(Pelotas, false)    7 
+(Porto Alegre, false)   11 
+(Praia Grande, false)   7 
+(Recife, false) 10 
+(Ribeirão Preto, false) 7 
+(Rio de Janeiro, false) 17 
+(Salvador, false)   11 
+(Santo André, false)    7 
+(Santos, false) 11 
+(São Bernardo do Campo, false)  11 
+(São José, false)   7 
+(São José do Rio Preto, false)  7 
+(São José dos Campos, false)    7 
+(São Luís, false)   3 
+(São Paulo, false)  17 
+(Teresina, false)   3 
+(Vitória, false)    3 
+ 
+Com isso faz com que  não tenha muita representação do norte e nordeste: 
+ 
+ 
+ 
+| Cidade                | Estado | Região       | Nº de anos | 
+| --------------------- | ------ | ------------ | ---------- | 
+| Aracaju               | SE     | Nordeste     | 3          | 
+| Barueri               | SP     | Sudeste      | 7          | 
+| Belo Horizonte        | MG     | Sudeste      | 10         | 
+| Belém                 | PA     | Norte        | 3          | 
+| Brasília              | DF     | Centro-Oeste | 11         | 
+| Campinas              | SP     | Sudeste      | 11         | 
+| Campo Grande          | MS     | Centro-Oeste | 3          | 
+| Cuiabá                | MT     | Centro-Oeste | 3          | 
+| Curitiba              | PR     | Sul          | 11         | 
+| Florianópolis         | SC     | Sul          | 9          | 
+| Fortaleza             | CE     | Nordeste     | 9          | 
+| Goiânia               | GO     | Centro-Oeste | 9          | 
+| Guarulhos             | SP     | Sudeste      | 7          | 
+| Joinville             | SC     | Sul          | 7          | 
+| João Pessoa           | PB     | Nordeste     | 3          | 
+| Maceió                | AL     | Nordeste     | 3          | 
+| Manaus                | AM     | Norte        | 3          | 
+| Natal                 | RN     | Nordeste     | 3          | 
+| Niterói               | RJ     | Sudeste      | 9          | 
+| Pelotas               | RS     | Sul          | 7          | 
+| Porto Alegre          | RS     | Sul          | 11         | 
+| Praia Grande          | SP     | Sudeste      | 7          | 
+| Recife                | PE     | Nordeste     | 10         | 
+| Ribeirão Preto        | SP     | Sudeste      | 7          | 
+| Rio de Janeiro        | RJ     | Sudeste      | 17         | 
+| Salvador              | BA     | Nordeste     | 11         | 
+| Santo André           | SP     | Sudeste      | 7          | 
+| Santos                | SP     | Sudeste      | 11         | 
+| São Bernardo do Campo | SP     | Sudeste      | 11         | 
+| São José (SC)         | SC     | Sul          | 7          | 
+| São José do Rio Preto | SP     | Sudeste      | 7          | 
+| São José dos Campos   | SP     | Sudeste      | 7          | 
+| São Luís              | MA     | Nordeste     | 3          | 
+| São Paulo             | SP     | Sudeste      | 17         | 
+| Teresina              | PI     | Nordeste     | 3          | 
+| Vitória               | ES     | Sudeste      | 3          | <hr class="ls0">#%% md 
+### Quantidade de dados por região: 
+![image.png](attachment:6241a999-a9b7-4739-9ac9-8432d891be11.png) <hr class="ls0">#%% md 
+verificando geograficamente <hr class="ls0">#%% 
+</span><span class="s4">import </span><span class="s0">pandas </span><span class="s4">as </span><span class="s0">pd</span>
+<span class="s4">import </span><span class="s0">plotly</span><span class="s1">.</span><span class="s0">express </span><span class="s4">as </span><span class="s0">px</span>
+
+<span class="s3"># Criar DataFrame</span>
+<span class="s0">dados </span><span class="s1">= {</span>
+    <span class="s2">&quot;Cidade&quot;</span><span class="s1">: [</span><span class="s2">&quot;Aracaju&quot;</span><span class="s1">,</span><span class="s2">&quot;Barueri&quot;</span><span class="s1">,</span><span class="s2">&quot;Belo Horizonte&quot;</span><span class="s1">,</span><span class="s2">&quot;Belém&quot;</span><span class="s1">,</span><span class="s2">&quot;Brasília&quot;</span><span class="s1">,</span><span class="s2">&quot;Campinas&quot;</span><span class="s1">,</span>
+               <span class="s2">&quot;Campo Grande&quot;</span><span class="s1">,</span><span class="s2">&quot;Cuiabá&quot;</span><span class="s1">,</span><span class="s2">&quot;Curitiba&quot;</span><span class="s1">,</span><span class="s2">&quot;Florianópolis&quot;</span><span class="s1">,</span><span class="s2">&quot;Fortaleza&quot;</span><span class="s1">,</span>
+               <span class="s2">&quot;Goiânia&quot;</span><span class="s1">,</span><span class="s2">&quot;Guarulhos&quot;</span><span class="s1">,</span><span class="s2">&quot;Joinville&quot;</span><span class="s1">,</span><span class="s2">&quot;João Pessoa&quot;</span><span class="s1">,</span><span class="s2">&quot;Maceió&quot;</span><span class="s1">,</span>
+               <span class="s2">&quot;Manaus&quot;</span><span class="s1">,</span><span class="s2">&quot;Natal&quot;</span><span class="s1">,</span><span class="s2">&quot;Niterói&quot;</span><span class="s1">,</span><span class="s2">&quot;Pelotas&quot;</span><span class="s1">,</span><span class="s2">&quot;Porto Alegre&quot;</span><span class="s1">,</span>
+               <span class="s2">&quot;Praia Grande&quot;</span><span class="s1">,</span><span class="s2">&quot;Recife&quot;</span><span class="s1">,</span><span class="s2">&quot;Ribeirão Preto&quot;</span><span class="s1">,</span><span class="s2">&quot;Rio de Janeiro&quot;</span><span class="s1">,</span>
+               <span class="s2">&quot;Salvador&quot;</span><span class="s1">,</span><span class="s2">&quot;Santo André&quot;</span><span class="s1">,</span><span class="s2">&quot;Santos&quot;</span><span class="s1">,</span><span class="s2">&quot;São Bernardo do Campo&quot;</span><span class="s1">,</span>
+               <span class="s2">&quot;São José (SC)&quot;</span><span class="s1">,</span><span class="s2">&quot;São José do Rio Preto&quot;</span><span class="s1">,</span><span class="s2">&quot;São José dos Campos&quot;</span><span class="s1">,</span>
+               <span class="s2">&quot;São Luís&quot;</span><span class="s1">,</span><span class="s2">&quot;São Paulo&quot;</span><span class="s1">,</span><span class="s2">&quot;Teresina&quot;</span><span class="s1">,</span><span class="s2">&quot;Vitória&quot;</span><span class="s1">],</span>
+
+    <span class="s2">&quot;Latitude&quot;</span><span class="s1">: [-</span><span class="s5">10.9472</span><span class="s1">,-</span><span class="s5">23.5112</span><span class="s1">,-</span><span class="s5">19.9167</span><span class="s1">,-</span><span class="s5">1.4558</span><span class="s1">,-</span><span class="s5">15.7801</span><span class="s1">,-</span><span class="s5">22.9056</span><span class="s1">,</span>
+                 <span class="s1">-</span><span class="s5">20.4428</span><span class="s1">,-</span><span class="s5">15.6014</span><span class="s1">,-</span><span class="s5">25.4284</span><span class="s1">,-</span><span class="s5">27.5954</span><span class="s1">,-</span><span class="s5">3.7172</span><span class="s1">,</span>
+                 <span class="s1">-</span><span class="s5">16.6869</span><span class="s1">,-</span><span class="s5">23.4628</span><span class="s1">,-</span><span class="s5">26.3045</span><span class="s1">,-</span><span class="s5">7.115</span><span class="s1">,-</span><span class="s5">9.6658</span><span class="s1">,</span>
+                 <span class="s1">-</span><span class="s5">3.119</span><span class="s1">,-</span><span class="s5">5.7945</span><span class="s1">,-</span><span class="s5">22.8858</span><span class="s1">,-</span><span class="s5">31.7654</span><span class="s1">,-</span><span class="s5">30.0346</span><span class="s1">,</span>
+                 <span class="s1">-</span><span class="s5">24.0058</span><span class="s1">,-</span><span class="s5">8.0539</span><span class="s1">,-</span><span class="s5">21.1775</span><span class="s1">,-</span><span class="s5">22.9068</span><span class="s1">,</span>
+                 <span class="s1">-</span><span class="s5">12.9714</span><span class="s1">,-</span><span class="s5">23.6666</span><span class="s1">,-</span><span class="s5">23.9608</span><span class="s1">,-</span><span class="s5">23.6944</span><span class="s1">,</span>
+                 <span class="s1">-</span><span class="s5">27.6146</span><span class="s1">,-</span><span class="s5">20.8127</span><span class="s1">,-</span><span class="s5">23.2237</span><span class="s1">,</span>
+                 <span class="s1">-</span><span class="s5">2.5307</span><span class="s1">,-</span><span class="s5">23.5505</span><span class="s1">,-</span><span class="s5">5.092</span><span class="s1">,-</span><span class="s5">20.3155</span><span class="s1">],</span>
+
+    <span class="s2">&quot;Longitude&quot;</span><span class="s1">: [-</span><span class="s5">37.0731</span><span class="s1">,-</span><span class="s5">46.8765</span><span class="s1">,-</span><span class="s5">43.9345</span><span class="s1">,-</span><span class="s5">48.4902</span><span class="s1">,-</span><span class="s5">47.9292</span><span class="s1">,-</span><span class="s5">47.0608</span><span class="s1">,</span>
+                  <span class="s1">-</span><span class="s5">54.6464</span><span class="s1">,-</span><span class="s5">56.0978</span><span class="s1">,-</span><span class="s5">49.2733</span><span class="s1">,-</span><span class="s5">48.548</span><span class="s1">,-</span><span class="s5">38.5433</span><span class="s1">,</span>
+                  <span class="s1">-</span><span class="s5">49.2648</span><span class="s1">,-</span><span class="s5">46.5333</span><span class="s1">,-</span><span class="s5">48.8456</span><span class="s1">,-</span><span class="s5">34.8631</span><span class="s1">,-</span><span class="s5">35.735</span><span class="s1">,</span>
+                  <span class="s1">-</span><span class="s5">60.0217</span><span class="s1">,-</span><span class="s5">35.211</span><span class="s1">,-</span><span class="s5">43.1153</span><span class="s1">,-</span><span class="s5">52.3376</span><span class="s1">,-</span><span class="s5">51.2177</span><span class="s1">,</span>
+                  <span class="s1">-</span><span class="s5">46.4028</span><span class="s1">,-</span><span class="s5">34.8811</span><span class="s1">,-</span><span class="s5">47.8103</span><span class="s1">,-</span><span class="s5">43.1729</span><span class="s1">,</span>
+                  <span class="s1">-</span><span class="s5">38.5014</span><span class="s1">,-</span><span class="s5">46.5322</span><span class="s1">,-</span><span class="s5">46.3339</span><span class="s1">,-</span><span class="s5">46.5654</span><span class="s1">,</span>
+                  <span class="s1">-</span><span class="s5">48.634</span><span class="s1">,-</span><span class="s5">49.3765</span><span class="s1">,-</span><span class="s5">45.9009</span><span class="s1">,</span>
+                  <span class="s1">-</span><span class="s5">44.3068</span><span class="s1">,-</span><span class="s5">46.6333</span><span class="s1">,-</span><span class="s5">42.8038</span><span class="s1">,-</span><span class="s5">40.3128</span><span class="s1">],</span>
+
+    <span class="s2">&quot;Quantidade&quot;</span><span class="s1">: [</span><span class="s5">3</span><span class="s1">,</span><span class="s5">7</span><span class="s1">,</span><span class="s5">10</span><span class="s1">,</span><span class="s5">3</span><span class="s1">,</span><span class="s5">11</span><span class="s1">,</span><span class="s5">11</span><span class="s1">,</span><span class="s5">3</span><span class="s1">,</span><span class="s5">3</span><span class="s1">,</span><span class="s5">11</span><span class="s1">,</span><span class="s5">9</span><span class="s1">,</span><span class="s5">9</span><span class="s1">,</span><span class="s5">9</span><span class="s1">,</span><span class="s5">7</span><span class="s1">,</span><span class="s5">7</span><span class="s1">,</span><span class="s5">3</span><span class="s1">,</span><span class="s5">3</span><span class="s1">,</span><span class="s5">3</span><span class="s1">,</span><span class="s5">3</span><span class="s1">,</span><span class="s5">9</span><span class="s1">,</span><span class="s5">7</span><span class="s1">,</span><span class="s5">11</span><span class="s1">,</span><span class="s5">7</span><span class="s1">,</span><span class="s5">10</span><span class="s1">,</span><span class="s5">7</span><span class="s1">,</span><span class="s5">17</span><span class="s1">,</span><span class="s5">11</span><span class="s1">,</span><span class="s5">7</span><span class="s1">,</span><span class="s5">11</span><span class="s1">,</span><span class="s5">11</span><span class="s1">,</span><span class="s5">7</span><span class="s1">,</span><span class="s5">7</span><span class="s1">,</span><span class="s5">7</span><span class="s1">,</span><span class="s5">3</span><span class="s1">,</span><span class="s5">17</span><span class="s1">,</span><span class="s5">3</span><span class="s1">,</span><span class="s5">3</span><span class="s1">]</span>
+<span class="s1">}</span>
+
+<span class="s0">df </span><span class="s1">= </span><span class="s0">pd</span><span class="s1">.</span><span class="s0">DataFrame</span><span class="s1">(</span><span class="s0">dados</span><span class="s1">)</span>
+
+<span class="s3"># Criar mapa de bolhas</span>
+<span class="s0">fig </span><span class="s1">= </span><span class="s0">px</span><span class="s1">.</span><span class="s0">scatter_geo</span><span class="s1">(</span>
+    <span class="s0">df</span><span class="s1">,</span>
+    <span class="s0">lat</span><span class="s1">=</span><span class="s2">&quot;Latitude&quot;</span><span class="s1">,</span>
+    <span class="s0">lon</span><span class="s1">=</span><span class="s2">&quot;Longitude&quot;</span><span class="s1">,</span>
+    <span class="s0">size</span><span class="s1">=</span><span class="s2">&quot;Quantidade&quot;</span><span class="s1">,</span>
+
+    <span class="s0">labels</span><span class="s1">=</span><span class="s2">&quot;Cidade&quot;</span><span class="s1">,</span>
+    <span class="s0">projection</span><span class="s1">=</span><span class="s2">&quot;natural earth&quot;</span><span class="s1">,</span>
+    <span class="s0">scope</span><span class="s1">=</span><span class="s2">&quot;south america&quot;</span><span class="s1">,</span>
+    <span class="s0">width</span><span class="s1">=</span><span class="s5">1200</span><span class="s1">,</span>
+    <span class="s0">height</span><span class="s1">=</span><span class="s5">800</span>
+<span class="s1">)</span>
+
+<span class="s0">fig</span><span class="s1">.</span><span class="s0">update_layout</span><span class="s1">(</span><span class="s0">title</span><span class="s1">=</span><span class="s2">&quot;Quantidade de Amostras por Cidade&quot;</span><span class="s1">)</span>
+<span class="s0">fig</span><span class="s1">.</span><span class="s0">show</span><span class="s1">()</span><hr class="ls0"><span class="s0">#%% md 
+</span></pre>
+</body>
+</html>

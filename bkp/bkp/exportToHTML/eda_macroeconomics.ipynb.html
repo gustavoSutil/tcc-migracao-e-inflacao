@@ -1,0 +1,191 @@
+<html>
+<head>
+<title>eda_macroeconomics.ipynb</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #bcbec4;}
+.s1 { color: #cf8e6d;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+.s4 { color: #7a7e85;}
+.s5 { color: #2aacb8;}
+.ls0 { height: 1px; border-width: 0; color: #43454a; background-color:#43454a}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+eda_macroeconomics.ipynb</font>
+</center></td></tr></table>
+<pre><span class="s0">#%% 
+</span><span class="s1">import </span><span class="s0">pandas </span><span class="s1">as </span><span class="s0">pd</span>
+<span class="s1">import </span><span class="s0">numpy </span><span class="s1">as </span><span class="s0">np</span>
+
+<span class="s0">df </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">read_csv</span><span class="s2">(</span>
+    <span class="s3">&quot;../data/raw/cambio_ipca_ic-br_mensal_2008_2023.csv&quot;</span><span class="s2">,</span>
+    <span class="s0">sep</span><span class="s2">=</span><span class="s3">&quot;</span><span class="s1">\t</span><span class="s3">&quot;</span>
+<span class="s2">)</span>
+
+<span class="s0">df</span><span class="s2">.</span><span class="s0">columns </span><span class="s2">= [</span>
+    <span class="s3">&quot;data&quot;</span><span class="s2">,</span>
+    <span class="s3">&quot;cambio&quot;</span><span class="s2">,</span>
+    <span class="s3">&quot;ipca&quot;</span><span class="s2">,</span>
+    <span class="s3">&quot;icbr&quot;</span>
+<span class="s2">]</span>
+
+<span class="s4"># converter números brasileiros</span>
+<span class="s1">for </span><span class="s0">col </span><span class="s1">in </span><span class="s2">[</span><span class="s3">&quot;cambio&quot;</span><span class="s2">,</span><span class="s3">&quot;ipca&quot;</span><span class="s2">,</span><span class="s3">&quot;icbr&quot;</span><span class="s2">]:</span>
+    <span class="s0">df</span><span class="s2">[</span><span class="s0">col</span><span class="s2">] = (</span>
+        <span class="s0">df</span><span class="s2">[</span><span class="s0">col</span><span class="s2">]</span>
+        <span class="s2">.</span><span class="s0">astype</span><span class="s2">(</span><span class="s0">str</span><span class="s2">)</span>
+        <span class="s2">.</span><span class="s0">str</span><span class="s2">.</span><span class="s0">replace</span><span class="s2">(</span><span class="s3">&quot;,&quot;</span><span class="s2">,</span><span class="s3">&quot;.&quot;</span><span class="s2">)</span>
+        <span class="s2">.</span><span class="s0">astype</span><span class="s2">(</span><span class="s0">float</span><span class="s2">)</span>
+    <span class="s2">)</span>
+
+<span class="s4"># data</span>
+<span class="s0">df</span><span class="s2">[</span><span class="s3">&quot;data&quot;</span><span class="s2">] = </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">to_datetime</span><span class="s2">(</span><span class="s0">df</span><span class="s2">[</span><span class="s3">&quot;data&quot;</span><span class="s2">], </span><span class="s0">format</span><span class="s2">=</span><span class="s3">&quot;%m/%Y&quot;</span><span class="s2">)</span>
+
+<span class="s0">df</span><span class="s2">[</span><span class="s3">&quot;ano&quot;</span><span class="s2">] = </span><span class="s0">df</span><span class="s2">[</span><span class="s3">&quot;data&quot;</span><span class="s2">].</span><span class="s0">dt</span><span class="s2">.</span><span class="s0">year</span>
+<span class="s0">df</span><span class="s2">[</span><span class="s3">&quot;mes&quot;</span><span class="s2">] = </span><span class="s0">df</span><span class="s2">[</span><span class="s3">&quot;data&quot;</span><span class="s2">].</span><span class="s0">dt</span><span class="s2">.</span><span class="s0">month</span>
+<hr class="ls0"><span class="s0">#%% 
+selic </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">read_csv</span><span class="s2">(</span>
+    <span class="s3">&quot;../data/raw/selic_diaria_2008_2023.csv&quot;</span><span class="s2">,</span>
+    <span class="s0">sep</span><span class="s2">=</span><span class="s3">&quot;</span><span class="s1">\t</span><span class="s3">&quot;</span>
+<span class="s2">)</span>
+
+<span class="s0">selic</span><span class="s2">.</span><span class="s0">describe</span><span class="s2">()</span>
+
+<span class="s0">selic</span><span class="s2">.</span><span class="s0">columns </span><span class="s2">= [</span><span class="s3">&quot;data&quot;</span><span class="s2">,</span><span class="s3">&quot;selic&quot;</span><span class="s2">]</span>
+
+<span class="s0">selic</span><span class="s2">[</span><span class="s3">&quot;selic&quot;</span><span class="s2">] = (</span>
+    <span class="s0">selic</span><span class="s2">[</span><span class="s3">&quot;selic&quot;</span><span class="s2">]</span>
+    <span class="s2">.</span><span class="s0">astype</span><span class="s2">(</span><span class="s0">str</span><span class="s2">)</span>
+    <span class="s2">.</span><span class="s0">str</span><span class="s2">.</span><span class="s0">replace</span><span class="s2">(</span><span class="s3">&quot;,&quot;</span><span class="s2">,</span><span class="s3">&quot;.&quot;</span><span class="s2">)</span>
+    <span class="s2">.</span><span class="s0">astype</span><span class="s2">(</span><span class="s0">float</span><span class="s2">)</span>
+<span class="s2">)</span>
+
+<span class="s0">selic</span><span class="s2">[</span><span class="s3">&quot;data&quot;</span><span class="s2">] = </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">to_datetime</span><span class="s2">(</span><span class="s0">selic</span><span class="s2">[</span><span class="s3">&quot;data&quot;</span><span class="s2">], </span><span class="s0">format</span><span class="s2">=</span><span class="s3">&quot;%d/%m/%Y&quot;</span><span class="s2">)</span>
+
+<span class="s0">selic</span><span class="s2">[</span><span class="s3">&quot;ano&quot;</span><span class="s2">] = </span><span class="s0">selic</span><span class="s2">[</span><span class="s3">&quot;data&quot;</span><span class="s2">].</span><span class="s0">dt</span><span class="s2">.</span><span class="s0">year</span>
+
+<span class="s0">selic_anual </span><span class="s2">= (</span>
+    <span class="s0">selic</span>
+    <span class="s2">.</span><span class="s0">groupby</span><span class="s2">(</span><span class="s3">&quot;ano&quot;</span><span class="s2">)[</span><span class="s3">&quot;selic&quot;</span><span class="s2">]</span>
+    <span class="s2">.</span><span class="s0">mean</span><span class="s2">()</span>
+    <span class="s2">.</span><span class="s0">reset_index</span><span class="s2">()</span>
+<span class="s2">)</span><hr class="ls0"><span class="s0">#%% 
+macro_mensal </span><span class="s2">= </span><span class="s0">df</span><span class="s2">.</span><span class="s0">copy</span><span class="s2">()</span>
+
+<span class="s0">macro_anual </span><span class="s2">= (</span>
+    <span class="s0">macro_mensal</span>
+    <span class="s2">.</span><span class="s0">groupby</span><span class="s2">(</span><span class="s3">&quot;ano&quot;</span><span class="s2">)</span>
+    <span class="s2">.</span><span class="s0">agg</span><span class="s2">({</span>
+        <span class="s3">&quot;cambio&quot;</span><span class="s2">:</span><span class="s3">&quot;mean&quot;</span><span class="s2">,</span>
+        <span class="s3">&quot;icbr&quot;</span><span class="s2">:</span><span class="s3">&quot;mean&quot;</span>
+    <span class="s2">})</span>
+<span class="s2">)</span>
+
+<span class="s4"># ipca = dezembro</span>
+<span class="s0">ipca_dez </span><span class="s2">= (</span>
+    <span class="s0">macro_mensal</span><span class="s2">[</span><span class="s0">macro_mensal</span><span class="s2">[</span><span class="s3">&quot;mes&quot;</span><span class="s2">] == </span><span class="s5">12</span><span class="s2">]</span>
+    <span class="s2">.</span><span class="s0">set_index</span><span class="s2">(</span><span class="s3">&quot;ano&quot;</span><span class="s2">)[</span><span class="s3">&quot;ipca&quot;</span><span class="s2">]</span>
+<span class="s2">)</span>
+
+<span class="s0">macro_anual</span><span class="s2">[</span><span class="s3">&quot;ipca&quot;</span><span class="s2">] = </span><span class="s0">ipca_dez</span>
+
+<span class="s0">macro_anual </span><span class="s2">= </span><span class="s0">macro_anual</span><span class="s2">.</span><span class="s0">reset_index</span><span class="s2">()</span><hr class="ls0"><span class="s0">#%% md 
+incc <hr class="ls0">#%% 
+</span><span class="s4"># ===============================</span>
+<span class="s4"># INCC (custo da construção)</span>
+<span class="s4"># ===============================</span>
+
+<span class="s0">incc </span><span class="s2">= </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">read_csv</span><span class="s2">(</span><span class="s3">&quot;../data/processed/incc-mensal.csv&quot;</span><span class="s2">)</span>
+
+<span class="s0">incc</span><span class="s2">.</span><span class="s0">columns </span><span class="s2">= [</span><span class="s3">&quot;data&quot;</span><span class="s2">, </span><span class="s3">&quot;incc&quot;</span><span class="s2">]</span>
+
+<span class="s4"># limpar aspas e converter</span>
+<span class="s0">incc</span><span class="s2">[</span><span class="s3">&quot;incc&quot;</span><span class="s2">] = (</span>
+    <span class="s0">incc</span><span class="s2">[</span><span class="s3">&quot;incc&quot;</span><span class="s2">]</span>
+    <span class="s2">.</span><span class="s0">astype</span><span class="s2">(</span><span class="s0">str</span><span class="s2">)</span>
+    <span class="s2">.</span><span class="s0">str</span><span class="s2">.</span><span class="s0">replace</span><span class="s2">(</span><span class="s3">&quot;'&quot;</span><span class="s2">, </span><span class="s3">&quot;&quot;</span><span class="s2">)</span>
+    <span class="s2">.</span><span class="s0">astype</span><span class="s2">(</span><span class="s0">float</span><span class="s2">)</span>
+<span class="s2">)</span>
+
+<span class="s4"># converter data</span>
+<span class="s0">incc</span><span class="s2">[</span><span class="s3">&quot;data&quot;</span><span class="s2">] = </span><span class="s0">pd</span><span class="s2">.</span><span class="s0">to_datetime</span><span class="s2">(</span><span class="s0">incc</span><span class="s2">[</span><span class="s3">&quot;data&quot;</span><span class="s2">], </span><span class="s0">format</span><span class="s2">=</span><span class="s3">&quot;%m/%Y&quot;</span><span class="s2">)</span>
+
+<span class="s0">incc</span><span class="s2">[</span><span class="s3">&quot;ano&quot;</span><span class="s2">] = </span><span class="s0">incc</span><span class="s2">[</span><span class="s3">&quot;data&quot;</span><span class="s2">].</span><span class="s0">dt</span><span class="s2">.</span><span class="s0">year</span>
+<span class="s0">incc</span><span class="s2">[</span><span class="s3">&quot;mes&quot;</span><span class="s2">] = </span><span class="s0">incc</span><span class="s2">[</span><span class="s3">&quot;data&quot;</span><span class="s2">].</span><span class="s0">dt</span><span class="s2">.</span><span class="s0">month</span>
+
+<span class="s4"># ===============================</span>
+<span class="s4"># INCC anual (dezembro = 12 meses)</span>
+<span class="s4"># ===============================</span>
+
+<span class="s0">incc_dez </span><span class="s2">= (</span>
+    <span class="s0">incc</span><span class="s2">[</span><span class="s0">incc</span><span class="s2">[</span><span class="s3">&quot;mes&quot;</span><span class="s2">] == </span><span class="s5">12</span><span class="s2">][[</span><span class="s3">&quot;ano&quot;</span><span class="s2">, </span><span class="s3">&quot;incc&quot;</span><span class="s2">]]</span>
+<span class="s2">)</span>
+
+<span class="s4"># ===============================</span>
+<span class="s4"># MERGE SEGURO (evita erro de index)</span>
+<span class="s4"># ===============================</span>
+
+<span class="s0">macro_anual </span><span class="s2">= </span><span class="s0">macro_anual</span><span class="s2">.</span><span class="s0">merge</span><span class="s2">(</span>
+    <span class="s0">incc_dez</span><span class="s2">,</span>
+    <span class="s0">on</span><span class="s2">=</span><span class="s3">&quot;ano&quot;</span><span class="s2">,</span>
+    <span class="s0">how</span><span class="s2">=</span><span class="s3">&quot;left&quot;</span>
+<span class="s2">)</span>
+
+<span class="s4"># ===============================</span>
+<span class="s4"># TRANSFORMAÇÕES</span>
+<span class="s4"># ===============================</span>
+
+<span class="s0">macro_anual</span><span class="s2">[</span><span class="s3">&quot;log_incc&quot;</span><span class="s2">] = </span><span class="s0">np</span><span class="s2">.</span><span class="s0">log</span><span class="s2">(</span><span class="s0">macro_anual</span><span class="s2">[</span><span class="s3">&quot;incc&quot;</span><span class="s2">])</span>
+<span class="s0">macro_anual</span><span class="s2">[</span><span class="s3">&quot;dlog_incc&quot;</span><span class="s2">] = </span><span class="s0">macro_anual</span><span class="s2">[</span><span class="s3">&quot;log_incc&quot;</span><span class="s2">].</span><span class="s0">diff</span><span class="s2">()</span>
+
+<span class="s4"># (opcional, mas recomendado)</span>
+<span class="s0">macro_anual</span><span class="s2">[</span><span class="s3">&quot;dlog_incc_lag1&quot;</span><span class="s2">] = </span><span class="s0">macro_anual</span><span class="s2">[</span><span class="s3">&quot;dlog_incc&quot;</span><span class="s2">].</span><span class="s0">shift</span><span class="s2">(</span><span class="s5">1</span><span class="s2">)</span>
+
+<span class="s4"># ===============================</span>
+<span class="s4"># FINAL</span>
+<span class="s4"># ===============================</span>
+
+<span class="s0">macro </span><span class="s2">= </span><span class="s0">macro_anual</span><span class="s2">.</span><span class="s0">copy</span><span class="s2">()</span>
+
+<span class="s0">df_final </span><span class="s2">= </span><span class="s0">df</span><span class="s2">.</span><span class="s0">merge</span><span class="s2">(</span>
+    <span class="s0">macro</span><span class="s2">,</span>
+    <span class="s0">on</span><span class="s2">=</span><span class="s3">&quot;ano&quot;</span><span class="s2">,</span>
+    <span class="s0">how</span><span class="s2">=</span><span class="s3">&quot;left&quot;</span>
+<span class="s2">)</span><hr class="ls0"><span class="s0">#%% 
+macro </span><span class="s2">= </span><span class="s0">macro_anual</span><span class="s2">.</span><span class="s0">merge</span><span class="s2">(</span>
+    <span class="s0">selic_anual</span><span class="s2">,</span>
+    <span class="s0">on</span><span class="s2">=</span><span class="s3">&quot;ano&quot;</span><span class="s2">,</span>
+    <span class="s0">how</span><span class="s2">=</span><span class="s3">&quot;left&quot;</span>
+<span class="s2">)</span>
+
+<span class="s0">macro </span><span class="s2">= </span><span class="s0">macro</span><span class="s2">.</span><span class="s0">sort_values</span><span class="s2">(</span><span class="s3">&quot;ano&quot;</span><span class="s2">)</span>
+
+<span class="s0">macro</span><span class="s2">[</span><span class="s3">&quot;icbr_var&quot;</span><span class="s2">] = </span><span class="s0">macro</span><span class="s2">[</span><span class="s3">&quot;icbr&quot;</span><span class="s2">].</span><span class="s0">pct_change</span><span class="s2">()</span>
+
+<span class="s0">macro </span><span class="s2">= </span><span class="s0">macro</span><span class="s2">[</span>
+    <span class="s2">(</span><span class="s0">macro</span><span class="s2">[</span><span class="s3">&quot;ano&quot;</span><span class="s2">] &gt;= </span><span class="s5">2009</span><span class="s2">) &amp;</span>
+    <span class="s2">(</span><span class="s0">macro</span><span class="s2">[</span><span class="s3">&quot;ano&quot;</span><span class="s2">] &lt;= </span><span class="s5">2023</span><span class="s2">)</span>
+<span class="s2">]</span>
+
+
+<span class="s0">macro </span><span class="s2">= </span><span class="s0">macro</span><span class="s2">.</span><span class="s0">rename</span><span class="s2">(</span><span class="s0">columns</span><span class="s2">={</span>
+    <span class="s3">&quot;cambio&quot;</span><span class="s2">:</span><span class="s3">&quot;cambio_brl_usd&quot;</span><span class="s2">,</span>
+    <span class="s3">&quot;icbr&quot;</span><span class="s2">:</span><span class="s3">&quot;ic_br&quot;</span><span class="s2">,</span>
+    <span class="s3">&quot;ipca&quot;</span><span class="s2">:</span><span class="s3">&quot;ipca_12m&quot;</span><span class="s2">,</span>
+    <span class="s3">&quot;selic&quot;</span><span class="s2">:</span><span class="s3">&quot;selic_media&quot;</span><span class="s2">,</span>
+    <span class="s3">&quot;icbr_var&quot;</span><span class="s2">:</span><span class="s3">&quot;d_ic_br&quot;</span>
+<span class="s2">})</span>
+
+<span class="s0">macro</span><span class="s2">.</span><span class="s0">to_csv</span><span class="s2">(</span>
+    <span class="s3">&quot;../data/processed/macro_brasil_anual_2009_2023.csv&quot;</span><span class="s2">,</span>
+    <span class="s0">index</span><span class="s2">=</span><span class="s1">False</span>
+<span class="s2">)</span>
+<hr class="ls0"><span class="s0">#%% 
+macro</span><span class="s2">.</span><span class="s0">describe</span><span class="s2">()</span></pre>
+</body>
+</html>
